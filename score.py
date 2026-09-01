@@ -307,3 +307,71 @@ def score_structured_data(ext):
         score += 2
 
     return score, signals
+
+
+# ---------------------------------------------------------------------------
+# Dimension 3: Content Citability (25 points)
+# ---------------------------------------------------------------------------
+
+def score_content_citability(ext):
+    """Score Content Citability dimension. Returns (score, signals_dict)."""
+    signals = {}
+    score = 0
+
+    h1_count = sum(1 for h in ext.headings if h[0] == 1)
+    signals["has_single_h1"] = h1_count == 1
+    if h1_count == 1:
+        score += 3
+
+    levels_used = set(h[0] for h in ext.headings)
+    signals["heading_depth"] = len(levels_used)
+    if len(levels_used) >= 3:
+        score += 3
+
+    all_text = " ".join(ext.paragraphs)
+    word_count = len(all_text.split())
+    signals["word_count"] = word_count
+    if word_count >= 300:
+        score += 3
+
+    if ext.paragraphs:
+        lengths = [len(p.split()) for p in ext.paragraphs]
+        med = median(lengths) if lengths else 0
+        signals["median_paragraph_words"] = med
+        signals["short_paragraphs"] = med < 100
+        if med < 100:
+            score += 3
+    else:
+        signals["median_paragraph_words"] = 0
+        signals["short_paragraphs"] = False
+
+    question_headings = [h for h in ext.headings if "?" in h[1]]
+    signals["has_faq_patterns"] = len(question_headings) > 0
+    if question_headings:
+        score += 3
+
+    signals["has_lists"] = ext.has_lists
+    if ext.has_lists:
+        score += 2
+
+    signals["has_tables"] = ext.has_tables
+    if ext.has_tables:
+        score += 2
+
+    desc = ext.meta.get("description", "")
+    desc_len = len(desc)
+    signals["meta_desc_ok"] = 120 <= desc_len <= 160
+    signals["meta_desc_len"] = desc_len
+    if signals["meta_desc_ok"]:
+        score += 3
+
+    if ext.images:
+        with_alt = sum(1 for img in ext.images if img["alt"])
+        coverage = with_alt / len(ext.images)
+    else:
+        coverage = 1.0
+    signals["alt_coverage"] = coverage
+    if coverage >= 0.8:
+        score += 3
+
+    return score, signals

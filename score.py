@@ -232,3 +232,78 @@ def score_crawler_access(fetched):
         score += 3
 
     return score, signals
+
+
+# ---------------------------------------------------------------------------
+# Dimension 2: Structured Data (30 points)
+# ---------------------------------------------------------------------------
+
+def _flatten_types(json_ld_list):
+    """Extract all @type values from JSON-LD blocks, including inside @graph."""
+    types = []
+    items = []
+    for block in json_ld_list:
+        if "@graph" in block:
+            items.extend(block["@graph"])
+        else:
+            items.append(block)
+    for item in items:
+        t = item.get("@type", "")
+        if isinstance(t, list):
+            types.extend(t)
+        elif t:
+            types.append(t)
+    return types, items
+
+
+def score_structured_data(ext):
+    """Score Structured Data dimension. Returns (score, signals_dict)."""
+    signals = {}
+    score = 0
+    types, items = _flatten_types(ext.json_ld)
+
+    signals["has_jsonld"] = len(ext.json_ld) > 0
+    if signals["has_jsonld"]:
+        score += 5
+
+    signals["has_graph"] = any("@graph" in b for b in ext.json_ld)
+    if signals["has_graph"]:
+        score += 5
+
+    org_types = {"Organization", "LocalBusiness"}
+    signals["has_org_or_local"] = bool(org_types & set(types))
+    if signals["has_org_or_local"]:
+        score += 5
+
+    required_fields = {"name", "url", "logo", "description", "sameAs"}
+    org_items = [i for i in items if i.get("@type") in org_types]
+    if org_items:
+        present = {k for k in required_fields if org_items[0].get(k)}
+        completeness = len(present) / len(required_fields)
+        signals["schema_completeness"] = completeness
+        score += round(5 * completeness)
+    else:
+        signals["schema_completeness"] = 0.0
+
+    faq_types = {"FAQPage", "HowTo"}
+    signals["has_faq_or_howto"] = bool(faq_types & set(types))
+    if signals["has_faq_or_howto"]:
+        score += 3
+
+    signals["has_breadcrumb"] = "BreadcrumbList" in types
+    if signals["has_breadcrumb"]:
+        score += 2
+
+    og_required = {"og:title", "og:description", "og:image", "og:type"}
+    og_present = {k for k in og_required if k in ext.meta}
+    signals["has_og_tags"] = len(og_present) == len(og_required)
+    if signals["has_og_tags"]:
+        score += 3
+
+    tw_required = {"twitter:card", "twitter:title", "twitter:description"}
+    tw_present = {k for k in tw_required if k in ext.meta}
+    signals["has_twitter_tags"] = len(tw_present) == len(tw_required)
+    if signals["has_twitter_tags"]:
+        score += 2
+
+    return score, signals

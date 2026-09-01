@@ -617,3 +617,61 @@ def format_report(url, scores, all_signals, recommendations):
 
     lines.append("Want automated weekly monitoring? gravitasindex.com")
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# CLI Entry Point
+# ---------------------------------------------------------------------------
+
+def main(args):
+    """Run the AI Visibility Audit on a URL."""
+    if not args:
+        print("Usage: python3 score.py <url>", file=sys.stderr)
+        sys.exit(1)
+
+    url = args[0]
+    if not url.startswith(("http://", "https://")):
+        url = f"https://{url}"
+
+    parsed = urlparse(url)
+    if not parsed.netloc:
+        print(f"Error: invalid URL '{args[0]}'", file=sys.stderr)
+        sys.exit(1)
+
+    print(f"Auditing {url} ...\n", file=sys.stderr)
+
+    fetched = fetch_all(url)
+
+    if fetched["html"][0] == 0:
+        print(f"Error: could not reach {url}", file=sys.stderr)
+        sys.exit(1)
+
+    ext = PageExtractor()
+    ext.feed(fetched["html"][1])
+    ext.close()
+
+    crawler_score, crawler_signals = score_crawler_access(fetched)
+    structured_score, structured_signals = score_structured_data(ext)
+    citability_score, citability_signals = score_content_citability(ext)
+    authority_score, authority_signals = score_entity_authority(ext)
+
+    scores = {
+        "crawler": crawler_score,
+        "structured": structured_score,
+        "citability": citability_score,
+        "authority": authority_score,
+    }
+
+    all_signals = {}
+    all_signals.update(crawler_signals)
+    all_signals.update(structured_signals)
+    all_signals.update(citability_signals)
+    all_signals.update(authority_signals)
+
+    recs = generate_recommendations(ext, fetched, all_signals)
+    report = format_report(url, scores, all_signals, recs)
+    print(report)
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

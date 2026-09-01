@@ -445,3 +445,175 @@ def score_content_citability(ext):
         score += 3
 
     return score, signals
+
+
+# ---------------------------------------------------------------------------
+# Fix Recommendation Engine
+# ---------------------------------------------------------------------------
+
+def generate_recommendations(ext, fetched, signals):
+    """Generate up to 5 personalized fix recommendations sorted by impact."""
+    recs = []
+    url = ext.meta.get("og:url", "")
+    site_name = ext.title.split("-")[0].split("|")[0].strip() or "Your Site"
+    description = ext.meta.get("description", "")
+
+    if not signals.get("llms_txt"):
+        desc_line = f"> {description}" if description else "> [Add a one-line description of your site]"
+        recs.append({
+            "title": "Add llms.txt",
+            "points": 5,
+            "why": "AI assistants look for /.well-known/llms.txt to understand your site. This is the single highest-impact file for AI discoverability.",
+            "code": f"# {site_name}\n{desc_line}\n\n## Docs\n- [Homepage]({url or 'https://yoursite.com'})",
+        })
+
+    blocked_bots = []
+    for bot in ["GPTBot", "ClaudeBot", "PerplexityBot"]:
+        if not signals.get(f"{bot}_allowed", True):
+            blocked_bots.append(bot)
+    if not signals.get("GoogleOther_allowed", True):
+        blocked_bots.append("GoogleOther")
+    if blocked_bots:
+        lines = "\n".join(f"User-agent: {bot}\nAllow: /" for bot in blocked_bots)
+        recs.append({
+            "title": f"Unblock {', '.join(blocked_bots)} in robots.txt",
+            "points": 3 * len(blocked_bots),
+            "why": f"Your robots.txt blocks {len(blocked_bots)} AI crawler(s). Unblocking lets AI assistants index your content and cite it in answers.",
+            "code": f"# Add to robots.txt:\n{lines}",
+        })
+
+    if not signals.get("has_org_or_local"):
+        social_links = [l for l in ext.links if any(s in l for s in ["twitter.com", "linkedin.com", "github.com", "facebook.com", "instagram.com", "youtube.com"])]
+        sameas_json = ""
+        if social_links:
+            sameas_json = ',\n    "sameAs": ' + json.dumps(social_links[:5])
+        logo = ext.meta.get("og:image", "https://yoursite.com/logo.png")
+        recs.append({
+            "title": "Add Organization schema",
+            "points": 5,
+            "why": "Organization schema tells AI assistants who you are, what you do, and where to find your profiles. Without it, AI has to guess.",
+            "code": '<script type="application/ld+json">\n' + json.dumps({
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": site_name,
+                "url": url or "https://yoursite.com",
+                "logo": logo,
+                "description": description or "[Your description]",
+                "sameAs": social_links[:5] if social_links else ["https://twitter.com/yourhandle"]
+            }, indent=2) + "\n</script>",
+        })
+    elif not signals.get("has_graph"):
+        recs.append({
+            "title": "Wrap JSON-LD in @graph",
+            "points": 5,
+            "why": "Using @graph connects your schema entities (Organization, WebSite, pages) into a knowledge graph that AI can traverse, rather than isolated fragments.",
+            "code": '{\n  "@context": "https://schema.org",\n  "@graph": [\n    { "@type": "Organization", ... },\n    { "@type": "WebSite", ... }\n  ]\n}',
+        })
+
+    if not signals.get("has_sameas") and signals.get("has_org_or_local"):
+        social_links = [l for l in ext.links if any(s in l for s in ["twitter.com", "linkedin.com", "github.com", "facebook.com"])]
+        if social_links:
+            recs.append({
+                "title": "Add sameAs social links to Organization schema",
+                "points": 5,
+                "why": "Your Organization schema has no sameAs links. Adding your social profiles helps AI cross-reference your brand identity.",
+                "code": '"sameAs": ' + json.dumps(social_links[:5], indent=2),
+            })
+
+    if not signals.get("has_og_tags"):
+        recs.append({
+            "title": "Add Open Graph meta tags",
+            "points": 3,
+            "why": "OG tags (og:title, og:description, og:image, og:type) are read by AI assistants and social platforms to understand and preview your pages.",
+            "code": f'<meta property="og:title" content="{site_name}">\n<meta property="og:description" content="{description or "[Description]"}">\n<meta property="og:image" content="{ext.meta.get("og:image", "https://yoursite.com/og.png")}">\n<meta property="og:type" content="website">',
+        })
+
+    if not signals.get("has_faq_or_howto"):
+        question_headings = [h for h in ext.headings if "?" in h[1]]
+        if question_headings:
+            qa_items = []
+            for _, q in question_headings[:3]:
+                qa_items.append({"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": "[Answer]"}})
+            recs.append({
+                "title": "Add FAQ schema for your question headings",
+                "points": 3,
+                "why": f"You have {len(question_headings)} question-style heading(s) but no FAQ schema. Adding it makes AI assistants more likely to cite your answers directly.",
+                "code": '<script type="application/ld+json">\n' + json.dumps({
+                    "@context": "https://schema.org",
+                    "@type": "FAQPage",
+                    "mainEntity": qa_items
+                }, indent=2) + "\n</script>",
+            })
+
+    if not signals.get("meta_desc_ok"):
+        first_para = ext.paragraphs[0] if ext.paragraphs else ""
+        suggested = first_para[:155].rsplit(" ", 1)[0] + "." if len(first_para) > 155 else first_para
+        if suggested and len(suggested) < 120:
+            suggested = suggested
+        elif not suggested:
+            suggested = f"{site_name} - [Describe what you do in 120-160 characters]"
+        recs.append({
+            "title": "Fix meta description length (aim for 120-160 chars)",
+            "points": 3,
+            "why": f"Your meta description is {signals.get('meta_desc_len', 0)} characters. AI assistants use it as a summary. 120-160 chars is the sweet spot.",
+            "code": f'<meta name="description" content="{suggested}">',
+        })
+
+    if not signals.get("sitemap"):
+        recs.append({
+            "title": "Add sitemap.xml",
+            "points": 3,
+            "why": "A valid sitemap.xml helps AI crawlers discover all your pages efficiently.",
+            "code": f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  <url><loc>{url or "https://yoursite.com/"}</loc></url>\n</urlset>',
+        })
+
+    recs.sort(key=lambda r: r["points"], reverse=True)
+    return recs[:5]
+
+
+# ---------------------------------------------------------------------------
+# Report Formatter
+# ---------------------------------------------------------------------------
+
+def _bar(score, max_score, width=10):
+    """Render an ASCII progress bar."""
+    filled = round((score / max_score) * width) if max_score else 0
+    return "█" * filled + "░" * (width - filled)
+
+
+def format_report(url, scores, all_signals, recommendations):
+    """Format the full audit report as a string."""
+    parsed = urlparse(url)
+    domain = parsed.netloc or url
+    total = sum(scores.values())
+
+    lines = []
+    lines.append(f"AI VISIBILITY AUDIT — {domain}")
+    lines.append(f"Score: {total} / 100")
+    lines.append("")
+
+    dims = [
+        ("AI Crawler Access", scores["crawler"], 25),
+        ("Structured Data", scores["structured"], 30),
+        ("Content Citability", scores["citability"], 25),
+        ("Entity & Authority", scores["authority"], 20),
+    ]
+    for name, sc, mx in dims:
+        bar = _bar(sc, mx)
+        lines.append(f"  {name:<22} {bar}  {sc}/{mx}")
+
+    if recommendations:
+        lines.append("")
+        lines.append("TOP FIXES (by impact):")
+        lines.append("")
+        for i, rec in enumerate(recommendations, 1):
+            lines.append(f"{i}. {rec['title']} (+{rec['points']}pts)")
+            lines.append(f"   {rec['why']}")
+            lines.append("   ───")
+            for code_line in rec["code"].splitlines():
+                lines.append(f"   {code_line}")
+            lines.append("   ───")
+            lines.append("")
+
+    lines.append("Want automated weekly monitoring? gravitasindex.com")
+    return "\n".join(lines)

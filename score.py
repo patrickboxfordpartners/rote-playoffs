@@ -310,6 +310,76 @@ def score_structured_data(ext):
 
 
 # ---------------------------------------------------------------------------
+# Dimension 4: Entity & Authority (20 points)
+# ---------------------------------------------------------------------------
+
+def _extract_brand_names(ext):
+    """Pull brand name candidates from title, og:title, and schema name."""
+    names = []
+    if ext.title:
+        name = ext.title.split("-")[0].split("|")[0].strip()
+        if name:
+            names.append(name.lower())
+    og = ext.meta.get("og:title", "")
+    if og:
+        names.append(og.lower().split("-")[0].split("|")[0].strip())
+    _, items = _flatten_types(ext.json_ld)
+    for item in items:
+        if item.get("@type") in ("Organization", "LocalBusiness"):
+            n = item.get("name", "")
+            if n:
+                names.append(n.lower())
+    return names
+
+
+def score_entity_authority(ext):
+    """Score Entity & Authority dimension. Returns (score, signals_dict)."""
+    signals = {}
+    score = 0
+    _, items = _flatten_types(ext.json_ld)
+
+    org_items = [i for i in items if i.get("@type") in ("Organization", "LocalBusiness")]
+    sameas = []
+    if org_items:
+        sameas = org_items[0].get("sameAs", [])
+        if isinstance(sameas, str):
+            sameas = [sameas]
+
+    signals["has_sameas"] = len(sameas) > 0
+    if signals["has_sameas"]:
+        score += 5
+
+    signals["sameas_count"] = len(sameas)
+    if len(sameas) >= 3:
+        score += 2
+
+    person_types = {"Person"}
+    signals["has_author"] = bool(person_types & {i.get("@type") for i in items})
+    if signals["has_author"]:
+        score += 3
+
+    links_lower = [l.lower() for l in ext.links]
+    signals["has_contact_link"] = any("contact" in l for l in links_lower)
+    if signals["has_contact_link"]:
+        score += 3
+
+    signals["has_about_link"] = any("about" in l for l in links_lower)
+    if signals["has_about_link"]:
+        score += 3
+
+    brands = _extract_brand_names(ext)
+    if len(brands) >= 2:
+        first = brands[0]
+        signals["brand_consistent"] = all(b == first for b in brands)
+        if signals["brand_consistent"]:
+            score += 4
+    else:
+        signals["brand_consistent"] = False
+
+    return score, signals
+
+
+# ---------------------------------------------------------------------------
 # Dimension 3: Content Citability (25 points)
 # ---------------------------------------------------------------------------
 

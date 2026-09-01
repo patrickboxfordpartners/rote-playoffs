@@ -81,22 +81,32 @@ _STALE_PATTERNS = [
 def _score_burstiness(text: str, paragraphs: list[str]) -> tuple[float, list[FlaggedSpan]]:
     flags = []
     para_cvs = []
+    offset = 0
 
     for para in paragraphs:
         sentences = split_sentences(para)
         if len(sentences) < 2:
+            # Still need to advance offset even if we skip this paragraph
+            pos = text.find(para, offset)
+            if pos != -1:
+                offset = pos + len(para)
             continue
         lengths = [len(s.split()) for s in sentences]
         avg = mean(lengths)
         if avg == 0:
+            # Still need to advance offset
+            pos = text.find(para, offset)
+            if pos != -1:
+                offset = pos + len(para)
             continue
         cv = stdev(lengths) / avg
         para_cvs.append(cv)
 
         if cv < 0.3:
-            start = text.find(para)
+            start = text.find(para, offset)
             if start == -1:
                 continue
+            offset = start + len(para)
             flags.append(FlaggedSpan(
                 start=start,
                 end=start + len(para),
@@ -109,6 +119,11 @@ def _score_burstiness(text: str, paragraphs: list[str]) -> tuple[float, list[Fla
                 ),
                 suggestion="Try varying sentence lengths: follow a long sentence with a short, punchy one.",
             ))
+        else:
+            # Advance offset even if cv >= 0.3
+            pos = text.find(para, offset)
+            if pos != -1:
+                offset = pos + len(para)
 
     if not para_cvs:
         return 0.0, flags

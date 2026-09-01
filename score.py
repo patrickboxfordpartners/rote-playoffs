@@ -97,3 +97,138 @@ class PageExtractor(HTMLParser):
 
     def handle_startendtag(self, tag, attrs):
         self.handle_starttag(tag, attrs)
+
+
+# ---------------------------------------------------------------------------
+# URL Fetching
+# ---------------------------------------------------------------------------
+
+def fetch_url(url, timeout=10):
+    """Fetch a URL. Returns (status_code, body_text). Returns (0, '') on error."""
+    try:
+        req = Request(url, headers={"User-Agent": "AIVisibilityAudit/1.0"})
+        with urlopen(req, timeout=timeout) as resp:
+            return (resp.status, resp.read().decode("utf-8", errors="replace"))
+    except HTTPError as e:
+        return (e.code, "")
+    except (URLError, OSError, ValueError):
+        return (0, "")
+
+
+def fetch_all(base_url):
+    """Fetch page HTML + robots.txt + llms.txt + llms-full.txt + sitemap.xml."""
+    parsed = urlparse(base_url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    targets = {
+        "html": base_url,
+        "robots": f"{origin}/robots.txt",
+        "llms": f"{origin}/.well-known/llms.txt",
+        "llms_full": f"{origin}/.well-known/llms-full.txt",
+        "sitemap": f"{origin}/sitemap.xml",
+    }
+    results = {}
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        futures = {pool.submit(fetch_url, url): key for key, url in targets.items()}
+        futures[pool.submit(fetch_url, f"{origin}/llms.txt")] = "llms_alt"
+        for future in as_completed(futures):
+            results[futures[future]] = future.result()
+    if results["llms"][0] != 200 and results.get("llms_alt", (0, ""))[0] == 200:
+        results["llms"] = results["llms_alt"]
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Robots.txt Parsing
+# ---------------------------------------------------------------------------
+
+AI_BOTS = ["GPTBot", "ClaudeBot", "PerplexityBot", "GoogleOther", "Google-Extended"]
+
+
+def parse_robots(text):
+    """Parse robots.txt into {user_agent_lower: [(directive, value)]}."""
+    agents = {}
+    current = None
+    for line in text.splitlines():
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        if line.lower().startswith("user-agent:"):
+            current = line.split(":", 1)[1].strip().lower()
+            agents.setdefault(current, [])
+        elif current and ":" in line:
+            directive, value = line.split(":", 1)
+            agents[current].append((directive.strip().lower(), value.strip()))
+    return agents
+
+
+def is_bot_blocked(agents, bot_name):
+    """Check if a bot is blocked. Bot-specific rules override wildcard."""
+    bot_lower = bot_name.lower()
+    if bot_lower in agents:
+        for directive, value in agents[bot_lower]:
+            if directive == "disallow" and value == "/":
+                return True
+            if directive == "allow" and value == "/":
+                return False
+        return False
+    if "*" in agents:
+        for directive, value in agents["*"]:
+            if directive == "disallow" and value == "/":
+                return True
+    return False
+
+
+# ---------------------------------------------------------------------------
+# Dimension 1: AI Crawler Access (25 points)
+# ---------------------------------------------------------------------------
+
+def score_crawler_access(fetched):
+    """Score AI Crawler Access. Returns (score, signals_dict)."""
+    signals = {}
+    score = 0
+
+    robots_status, robots_body = fetched["robots"]
+    has_robots = robots_status == 200 and robots_body.strip()
+    signals["robots_exists"] = has_robots
+    if has_robots:
+        score += 3
+        agents = parse_robots(robots_body)
+    else:
+        agents = {}
+        if not has_robots:
+            for bot in ["GPTBot", "ClaudeBot", "PerplexityBot"]:
+                signals[f"{bot}_allowed"] = False
+            signals["GoogleOther_allowed"] = False
+            return score, signals
+
+    for bot in ["GPTBot", "ClaudeBot", "PerplexityBot"]:
+        blocked = is_bot_blocked(agents, bot)
+        signals[f"{bot}_allowed"] = not blocked
+        if not blocked:
+            score += 3
+
+    google_blocked = is_bot_blocked(agents, "GoogleOther") and is_bot_blocked(agents, "Google-Extended")
+    signals["GoogleOther_allowed"] = not google_blocked
+    if not google_blocked:
+        score += 3
+
+    signals["llms_txt"] = fetched["llms"][0] == 200
+    if signals["llms_txt"]:
+        score += 5
+
+    signals["llms_full_txt"] = fetched["llms_full"][0] == 200
+    if signals["llms_full_txt"]:
+        score += 2
+
+    sitemap_ok = False
+    if fetched["sitemap"][0] == 200:
+        try:
+            ET.fromstring(fetched["sitemap"][1])
+            sitemap_ok = True
+        except ET.ParseError:
+            pass
+    signals["sitemap"] = sitemap_ok
+    if sitemap_ok:
+        score += 3
+
+    return score, signals

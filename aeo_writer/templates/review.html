@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Content Citability Review</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,system-ui,'Segoe UI',sans-serif;background:#0f0f23;color:#e0e0e0}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#1a1a2e;border-bottom:1px solid #333}
+.header h1{font-size:18px;font-weight:600;color:#fff}
+.score-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:20px;font-weight:700;font-size:14px}
+.score-strong{background:#1a472a;color:#2ecc71}
+.score-needs-work{background:#4a3500;color:#f39c12}
+.score-weak{background:#4a1a1a;color:#e74c3c}
+.legend{display:flex;gap:16px;font-size:12px;padding:8px 24px;background:#16213e;border-bottom:1px solid #333}
+.legend-item{display:flex;align-items:center;gap:4px}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.actions{display:flex;gap:8px}
+.btn{padding:8px 16px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-secondary{background:#333;color:#e0e0e0}
+.btn-secondary:hover{background:#444}
+.btn-primary{background:#3498db;color:#fff}
+.btn-primary:hover{background:#2980b9}
+.panels{display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 90px)}
+.panel{overflow-y:auto;padding:24px 32px;line-height:1.7}
+.panel-left{border-right:1px solid #333}
+.panel-left h2,.panel-left h3{margin:24px 0 12px;color:#fff}
+.panel-left p{margin:0 0 16px;color:#ccc}
+.panel-right{background:#1a1a2e}
+.flag{position:relative;cursor:pointer;border-radius:2px;padding:1px 0}
+.flag-vocabulary{background:rgba(231,76,60,0.15);border-bottom:2px solid #e74c3c}
+.flag-burstiness,.flag-monotony{background:rgba(230,126,34,0.15);border-bottom:2px solid #e67e22}
+.flag-hedging{background:rgba(243,156,18,0.15);border-bottom:2px solid #f39c12}
+.flag-specificity{background:rgba(52,152,219,0.15);border-bottom:2px solid #3498db}
+.tooltip{display:none;position:absolute;bottom:calc(100% + 8px);left:0;min-width:280px;max-width:400px;padding:12px;background:#16213e;border:1px solid #444;border-radius:8px;font-size:13px;line-height:1.5;color:#ddd;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.4)}
+.flag:hover .tooltip{display:block}
+.tooltip .signal-label{font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:0.5px;margin-bottom:4px}
+.tooltip .suggestion{color:#999;font-size:12px;margin-top:6px}
+.signal-scores{display:flex;gap:12px;padding:12px 24px;background:#16213e;font-size:12px}
+.signal-score{display:flex;align-items:center;gap:6px}
+.signal-bar{width:60px;height:6px;border-radius:3px;background:#333;overflow:hidden}
+.signal-fill{height:100%;border-radius:3px;transition:width 0.3s}
+[contenteditable=true]{outline:none;border-radius:3px}
+[contenteditable=true]:focus{box-shadow:0 0 0 2px rgba(52,152,219,0.4)}
+.para-block{margin-bottom:16px;padding:8px 12px;border-radius:6px;border-left:3px solid transparent}
+.para-block.flagged{border-left-color:#e67e22}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Content Citability Review</h1>
+  <div class="score-badge" id="score-badge"></div>
+  <div class="actions">
+    <button class="btn btn-secondary" id="btn-recheck">Save &amp; Re-check</button>
+    <button class="btn btn-primary" id="btn-approve">Approve</button>
+  </div>
+</div>
+<div class="legend">
+  <div class="legend-item"><span class="legend-dot" style="background:#e74c3c"></span> Stale vocabulary</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#e67e22"></span> Monotony / burstiness</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#f39c12"></span> Hedging</div>
+  <div class="legend-item"><span class="legend-dot" style="background:#3498db"></span> Low specificity</div>
+</div>
+<div class="signal-scores" id="signal-scores"></div>
+<div class="panels">
+  <div class="panel panel-left" id="clean-view"></div>
+  <div class="panel panel-right" id="flagged-view"></div>
+</div>
+<script>
+const SIGNAL_COLORS = {
+  vocabulary: '#e74c3c', burstiness: '#e67e22', monotony: '#e67e22',
+  hedging: '#f39c12', specificity: '#3498db'
+};
+let DATA = null;
+
+async function loadData() {
+  const resp = await fetch('/api/data');
+  DATA = await resp.json();
+  render();
+}
+
+function mdToHtml(md) {
+  if (!md) return '';
+  return md
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" style="color:#3498db">$1</a>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+    .split(/\n\s*\n/)
+    .filter(p => p.trim())
+    .map(p => p.startsWith('<h') || p.startsWith('<ul') ? p : `<p>${p.trim()}</p>`)
+    .join('\n');
+}
+
+function renderScoreBadge() {
+  const el = document.getElementById('score-badge');
+  const s = DATA.overall_score;
+  const pct = Math.round((1 - s) * 100);
+  let cls, label;
+  if (s < 0.3) { cls = 'score-strong'; label = 'STRONG'; }
+  else if (s < 0.6) { cls = 'score-needs-work'; label = 'NEEDS WORK'; }
+  else { cls = 'score-weak'; label = 'WEAK'; }
+  el.className = 'score-badge ' + cls;
+  el.textContent = `${pct}/100 — ${label}`;
+}
+
+function renderSignalScores() {
+  const el = document.getElementById('signal-scores');
+  el.innerHTML = Object.entries(DATA.signal_scores).map(([k, v]) => {
+    const pct = Math.round((1 - v) * 100);
+    const color = SIGNAL_COLORS[k] || '#888';
+    return `<div class="signal-score"><span>${k}</span><div class="signal-bar"><div class="signal-fill" style="width:${pct}%;background:${color}"></div></div><span>${pct}%</span></div>`;
+  }).join('');
+}
+
+function renderCleanView() {
+  document.getElementById('clean-view').innerHTML = mdToHtml(DATA.text);
+}
+
+function applyFlags(text, flags) {
+  const sorted = [...flags].sort((a, b) => b.start - a.start);
+  let html = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const offsets = [];
+  for (const f of sorted) {
+    const before = html.slice(0, f.start);
+    const span = html.slice(f.start, f.end);
+    const after = html.slice(f.end);
+    const cls = `flag flag-${f.signal}`;
+    const tip = `<div class="tooltip"><div class="signal-label" style="color:${SIGNAL_COLORS[f.signal]}">${f.signal}</div>${f.annotation}${f.suggestion ? `<div class="suggestion">${f.suggestion}</div>` : ''}</div>`;
+    html = before + `<span class="${cls}" contenteditable="true">${span}${tip}</span>` + after;
+  }
+  return html;
+}
+
+function renderFlaggedView() {
+  const el = document.getElementById('flagged-view');
+  const paras = DATA.text.split(/\n\s*\n/).filter(p => p.trim());
+  let offset = 0;
+  el.innerHTML = paras.map(para => {
+    const start = DATA.text.indexOf(para, offset);
+    const end = start + para.length;
+    offset = end;
+    const paraFlags = DATA.flags.filter(f => f.start >= start && f.end <= end)
+      .map(f => ({...f, start: f.start - start, end: f.end - start}));
+    const flagged = paraFlags.length > 0;
+    const html = applyFlags(para, paraFlags);
+    return `<div class="para-block${flagged ? ' flagged' : ''}">${html}</div>`;
+  }).join('');
+}
+
+function render() {
+  renderScoreBadge();
+  renderSignalScores();
+  renderCleanView();
+  renderFlaggedView();
+}
+
+function collectText() {
+  const blocks = document.querySelectorAll('#flagged-view .para-block');
+  return Array.from(blocks).map(b => b.textContent.trim()).join('\n\n');
+}
+
+document.getElementById('btn-recheck').addEventListener('click', async () => {
+  const text = collectText();
+  const resp = await fetch('/api/recheck', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text})
+  });
+  DATA = await resp.json();
+  render();
+});
+
+document.getElementById('btn-approve').addEventListener('click', async () => {
+  const text = collectText();
+  await fetch('/api/approve', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text})
+  });
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:24px;color:#2ecc71">Approved. You can close this tab.</div>';
+});
+
+loadData();
+</script>
+</body>
+</html>

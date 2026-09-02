@@ -92,11 +92,15 @@ class TestScoreCrawlerAccess:
         score, signals = score_crawler_access(fetched)
         assert score == 25
 
-    def test_zero_score(self):
+    def test_no_robots_still_allows_bots(self):
         fetched = self._make_fetched(robots_status=404)
         score, signals = score_crawler_access(fetched)
-        assert score == 0
         assert signals["robots_exists"] is False
+        assert signals["GPTBot_allowed"] is True
+        assert signals["ClaudeBot_allowed"] is True
+        assert signals["PerplexityBot_allowed"] is True
+        assert signals["GoogleOther_allowed"] is True
+        assert score == 12  # 4 bots * 3pts each, no robots.txt bonus
 
     def test_blocked_bots_lose_points(self):
         fetched = self._make_fetched(robots=ROBOTS_BLOCK_MULTIPLE)

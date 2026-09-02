@@ -188,28 +188,25 @@ def score_crawler_access(fetched):
     score = 0
 
     robots_status, robots_body = fetched["robots"]
-    has_robots = robots_status == 200 and robots_body.strip()
+    has_robots = robots_status == 200 and bool(robots_body.strip())
     signals["robots_exists"] = has_robots
     if has_robots:
         score += 3
         agents = parse_robots(robots_body)
-    else:
-        agents = {}
-        if not has_robots:
-            for bot in ["GPTBot", "ClaudeBot", "PerplexityBot"]:
-                signals[f"{bot}_allowed"] = False
-            signals["GoogleOther_allowed"] = False
-            return score, signals
-
-    for bot in ["GPTBot", "ClaudeBot", "PerplexityBot"]:
-        blocked = is_bot_blocked(agents, bot)
-        signals[f"{bot}_allowed"] = not blocked
-        if not blocked:
+        for bot in ["GPTBot", "ClaudeBot", "PerplexityBot"]:
+            blocked = is_bot_blocked(agents, bot)
+            signals[f"{bot}_allowed"] = not blocked
+            if not blocked:
+                score += 3
+        google_blocked = is_bot_blocked(agents, "GoogleOther") and is_bot_blocked(agents, "Google-Extended")
+        signals["GoogleOther_allowed"] = not google_blocked
+        if not google_blocked:
             score += 3
-
-    google_blocked = is_bot_blocked(agents, "GoogleOther") and is_bot_blocked(agents, "Google-Extended")
-    signals["GoogleOther_allowed"] = not google_blocked
-    if not google_blocked:
+    else:
+        for bot in ["GPTBot", "ClaudeBot", "PerplexityBot"]:
+            signals[f"{bot}_allowed"] = True
+            score += 3
+        signals["GoogleOther_allowed"] = True
         score += 3
 
     signals["llms_txt"] = fetched["llms"][0] == 200
@@ -317,12 +314,12 @@ def _extract_brand_names(ext):
     """Pull brand name candidates from title, og:title, and schema name."""
     names = []
     if ext.title:
-        name = ext.title.split("-")[0].split("|")[0].strip()
+        name = _clean_site_name(ext.title)
         if name:
             names.append(name.lower())
     og = ext.meta.get("og:title", "")
     if og:
-        names.append(og.lower().split("-")[0].split("|")[0].strip())
+        names.append(_clean_site_name(og).lower())
     _, items = _flatten_types(ext.json_ld)
     for item in items:
         if item.get("@type") in ("Organization", "LocalBusiness"):
@@ -395,12 +392,14 @@ def score_content_citability(ext):
 
     levels_used = set(h[0] for h in ext.headings)
     signals["heading_depth"] = len(levels_used)
+    signals["heading_depth_ok"] = len(levels_used) >= 3
     if len(levels_used) >= 3:
         score += 3
 
     all_text = " ".join(ext.paragraphs)
     word_count = len(all_text.split())
     signals["word_count"] = word_count
+    signals["content_length_ok"] = word_count >= 300
     if word_count >= 300:
         score += 3
 
@@ -441,6 +440,7 @@ def score_content_citability(ext):
     else:
         coverage = 1.0
     signals["alt_coverage"] = coverage
+    signals["alt_coverage_ok"] = coverage >= 0.8
     if coverage >= 0.8:
         score += 3
 
@@ -451,11 +451,24 @@ def score_content_citability(ext):
 # Fix Recommendation Engine
 # ---------------------------------------------------------------------------
 
-def generate_recommendations(ext, fetched, signals):
+_GENERIC_TITLE_PARTS = {"home", "homepage", "welcome", "index", "main", "start"}
+
+def _clean_site_name(raw_title):
+    """Extract the brand name from a page title by stripping common separators."""
+    parts = [p.strip() for p in re.split(r'\s*[\|\-–—·:\\\/]\s*', raw_title) if p.strip()]
+    if not parts:
+        return ""
+    if len(parts) > 1 and parts[0].lower() in _GENERIC_TITLE_PARTS:
+        return parts[-1]
+    return parts[0]
+
+
+def generate_recommendations(ext, fetched, signals, input_url=""):
     """Generate up to 5 personalized fix recommendations sorted by impact."""
     recs = []
-    url = ext.meta.get("og:url", "")
-    site_name = ext.title.split("-")[0].split("|")[0].strip() or "Your Site"
+    url = ext.meta.get("og:url", "") or input_url
+    domain_name = urlparse(url).netloc.replace("www.", "") if url else ""
+    site_name = _clean_site_name(ext.title) or domain_name or "Your Site"
     description = ext.meta.get("description", "")
 
     if not signals.get("llms_txt"):
@@ -483,11 +496,8 @@ def generate_recommendations(ext, fetched, signals):
         })
 
     if not signals.get("has_org_or_local"):
-        social_links = [l for l in ext.links if any(s in l for s in ["twitter.com", "linkedin.com", "github.com", "facebook.com", "instagram.com", "youtube.com"])]
-        sameas_json = ""
-        if social_links:
-            sameas_json = ',\n    "sameAs": ' + json.dumps(social_links[:5])
-        logo = ext.meta.get("og:image", "https://yoursite.com/logo.png")
+        social_links = list(dict.fromkeys(l for l in ext.links if any(s in l for s in ["twitter.com", "linkedin.com", "github.com", "facebook.com", "instagram.com", "youtube.com", "x.com"])))
+        logo = ext.meta.get("og:image", f"{url}/logo.png" if url else "https://yoursite.com/logo.png")
         recs.append({
             "title": "Add Organization schema",
             "points": 5,
@@ -499,9 +509,10 @@ def generate_recommendations(ext, fetched, signals):
                 "url": url or "https://yoursite.com",
                 "logo": logo,
                 "description": description or "[Your description]",
-                "sameAs": social_links[:5] if social_links else ["https://twitter.com/yourhandle"]
+                "sameAs": social_links[:5] if social_links else ["https://twitter.com/yourhandle", "https://linkedin.com/company/yourcompany"]
             }, indent=2) + "\n</script>",
         })
+
     elif not signals.get("has_graph"):
         recs.append({
             "title": "Wrap JSON-LD in @graph",
@@ -511,7 +522,7 @@ def generate_recommendations(ext, fetched, signals):
         })
 
     if not signals.get("has_sameas") and signals.get("has_org_or_local"):
-        social_links = [l for l in ext.links if any(s in l for s in ["twitter.com", "linkedin.com", "github.com", "facebook.com"])]
+        social_links = list(dict.fromkeys(l for l in ext.links if any(s in l for s in ["twitter.com", "linkedin.com", "github.com", "facebook.com", "instagram.com", "youtube.com", "x.com"])))
         if social_links:
             recs.append({
                 "title": "Add sameAs social links to Organization schema",
@@ -525,7 +536,7 @@ def generate_recommendations(ext, fetched, signals):
             "title": "Add Open Graph meta tags",
             "points": 3,
             "why": "OG tags (og:title, og:description, og:image, og:type) are read by AI assistants and social platforms to understand and preview your pages.",
-            "code": f'<meta property="og:title" content="{site_name}">\n<meta property="og:description" content="{description or "[Description]"}">\n<meta property="og:image" content="{ext.meta.get("og:image", "https://yoursite.com/og.png")}">\n<meta property="og:type" content="website">',
+            "code": f'<meta property="og:title" content="{site_name}">\n<meta property="og:description" content="{description or "[Description]"}">\n<meta property="og:image" content="{ext.meta.get("og:image", f"{url}/og-image.png" if url else "[your-image-url]")}">\n<meta property="og:type" content="website">',
         })
 
     if not signals.get("has_faq_or_howto"):
@@ -546,16 +557,24 @@ def generate_recommendations(ext, fetched, signals):
             })
 
     if not signals.get("meta_desc_ok"):
-        first_para = ext.paragraphs[0] if ext.paragraphs else ""
-        suggested = first_para[:155].rsplit(" ", 1)[0] + "." if len(first_para) > 155 else first_para
-        if suggested and len(suggested) < 120:
-            suggested = suggested
-        elif not suggested:
-            suggested = f"{site_name} - [Describe what you do in 120-160 characters]"
+        desc_len = signals.get("meta_desc_len", 0)
+        suggested = ""
+        if description and desc_len > 160:
+            suggested = description[:155].rsplit(" ", 1)[0] + "..."
+        elif description and desc_len < 120:
+            suggested = description
+            if len(suggested) < 80:
+                suggested = f"{site_name}. {suggested}" if site_name != "Your Site" else suggested
+        if not suggested or len(suggested) < 40:
+            long_paras = [p for p in ext.paragraphs if len(p) > 80]
+            if long_paras:
+                suggested = long_paras[0][:155].rsplit(" ", 1)[0] + "."
+            else:
+                suggested = f"{site_name} - [Describe what you do in 120-160 characters]"
         recs.append({
             "title": "Fix meta description length (aim for 120-160 chars)",
             "points": 3,
-            "why": f"Your meta description is {signals.get('meta_desc_len', 0)} characters. AI assistants use it as a summary. 120-160 chars is the sweet spot.",
+            "why": f"Your meta description is {desc_len} characters. AI assistants use it as a summary. 120-160 chars is the sweet spot.",
             "code": f'<meta name="description" content="{suggested}">',
         })
 
@@ -581,15 +600,73 @@ def _bar(score, max_score, width=10):
     return "█" * filled + "░" * (width - filled)
 
 
+def _grade(total):
+    """Return a letter grade and descriptor for the total score."""
+    if total >= 80:
+        return "A", "Excellent"
+    if total >= 60:
+        return "B", "Good"
+    if total >= 40:
+        return "C", "Fair"
+    if total >= 20:
+        return "D", "Poor"
+    return "F", "Critical"
+
+
+_SIGNAL_LABELS = {
+    "robots_exists": ("robots.txt exists and parseable", "crawler"),
+    "GPTBot_allowed": ("GPTBot not blocked", "crawler"),
+    "ClaudeBot_allowed": ("ClaudeBot not blocked", "crawler"),
+    "PerplexityBot_allowed": ("PerplexityBot not blocked", "crawler"),
+    "GoogleOther_allowed": ("Google AI crawlers not blocked", "crawler"),
+    "llms_txt": ("llms.txt present", "crawler"),
+    "llms_full_txt": ("llms-full.txt present", "crawler"),
+    "sitemap": ("sitemap.xml accessible and valid", "crawler"),
+    "has_jsonld": ("JSON-LD structured data present", "structured"),
+    "has_graph": ("Uses @graph (connected entities)", "structured"),
+    "has_org_or_local": ("Organization or LocalBusiness schema", "structured"),
+    "schema_completeness": None,
+    "has_faq_or_howto": ("FAQ or HowTo schema", "structured"),
+    "has_breadcrumb": ("Breadcrumb schema", "structured"),
+    "has_og_tags": ("Open Graph tags complete", "structured"),
+    "has_twitter_tags": ("Twitter Card tags complete", "structured"),
+    "has_single_h1": ("Single H1 tag", "citability"),
+    "heading_depth": None,
+    "word_count": None,
+    "content_length_ok": ("300+ words of content", "citability"),
+    "heading_depth_ok": ("3+ heading levels used", "citability"),
+    "short_paragraphs": ("Short, readable paragraphs", "citability"),
+    "has_faq_patterns": ("Question-answer patterns in headings", "citability"),
+    "has_lists": ("Lists present (ul/ol)", "citability"),
+    "has_tables": ("Tables present", "citability"),
+    "meta_desc_ok": ("Meta description 120-160 chars", "citability"),
+    "alt_coverage_ok": ("Image alt text coverage >= 80%", "citability"),
+    "has_sameas": ("Organization has sameAs social links", "authority"),
+    "sameas_count": None,
+    "has_author": ("Author/Person schema present", "authority"),
+    "has_contact_link": ("Contact page linked", "authority"),
+    "has_about_link": ("About page linked", "authority"),
+    "brand_consistent": ("Brand name consistent across signals", "authority"),
+}
+
+_DIM_KEYS = {
+    "crawler": "AI Crawler Access",
+    "structured": "Structured Data",
+    "citability": "Content Citability",
+    "authority": "Entity & Authority",
+}
+
+
 def format_report(url, scores, all_signals, recommendations):
     """Format the full audit report as a string."""
     parsed = urlparse(url)
     domain = parsed.netloc or url
     total = sum(scores.values())
+    letter, descriptor = _grade(total)
 
     lines = []
-    lines.append(f"AI VISIBILITY AUDIT — {domain}")
-    lines.append(f"Score: {total} / 100")
+    lines.append(f"AI VISIBILITY AUDIT : {domain}")
+    lines.append(f"Score: {total} / 100  ({letter} - {descriptor})")
     lines.append("")
 
     dims = [
@@ -601,6 +678,22 @@ def format_report(url, scores, all_signals, recommendations):
     for name, sc, mx in dims:
         bar = _bar(sc, mx)
         lines.append(f"  {name:<22} {bar}  {sc}/{mx}")
+
+    lines.append("")
+    lines.append("SIGNAL DETAILS:")
+    for dim_key, dim_name in _DIM_KEYS.items():
+        lines.append(f"  {dim_name}:")
+        for sig_key, label_info in _SIGNAL_LABELS.items():
+            if label_info is None:
+                continue
+            label, dim = label_info
+            if dim != dim_key:
+                continue
+            val = all_signals.get(sig_key)
+            if val is True:
+                lines.append(f"    [PASS] {label}")
+            elif val is False:
+                lines.append(f"    [FAIL] {label}")
 
     if recommendations:
         lines.append("")
@@ -668,7 +761,7 @@ def main(args):
     all_signals.update(citability_signals)
     all_signals.update(authority_signals)
 
-    recs = generate_recommendations(ext, fetched, all_signals)
+    recs = generate_recommendations(ext, fetched, all_signals, input_url=url)
     report = format_report(url, scores, all_signals, recs)
     print(report)
 

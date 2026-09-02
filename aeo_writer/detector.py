@@ -181,17 +181,20 @@ def _score_hedging(text: str, sentences: list[str]) -> tuple[float, list[Flagged
         return 0.0, flags
 
     hedging_sentence_count = 0
+    offset = 0
 
     for sent in sentences:
+        sent_start = text.find(sent, offset)
+        if sent_start == -1:
+            continue
+        offset = sent_start + len(sent)
+
         found_hedge = False
         for pattern, phrase in _HEDGE_PATTERNS:
             for match in pattern.finditer(sent):
-                offset = text.find(sent)
-                if offset == -1:
-                    continue
                 flags.append(FlaggedSpan(
-                    start=offset + match.start(),
-                    end=offset + match.end(),
+                    start=sent_start + match.start(),
+                    end=sent_start + match.end(),
                     signal="hedging",
                     score=1.0,
                     annotation=(
@@ -203,12 +206,9 @@ def _score_hedging(text: str, sentences: list[str]) -> tuple[float, list[Flagged
                 found_hedge = True
 
         for match in _MAY_MIGHT.finditer(sent):
-            offset = text.find(sent)
-            if offset == -1:
-                continue
             flags.append(FlaggedSpan(
-                start=offset + match.start(),
-                end=offset + match.end(),
+                start=sent_start + match.start(),
+                end=sent_start + match.end(),
                 signal="hedging",
                 score=0.8,
                 annotation=(
@@ -249,14 +249,16 @@ def _score_monotony(text: str, paragraphs: list[str]) -> tuple[float, list[Flagg
     length_cv = stdev(lengths) / avg_len if avg_len > 0 else 0.0
 
     opener_score = max(0.0, min(1.0, (opener_repetition - 0.2) / 0.2))
-    length_score = max(0.0, min(1.0, (0.185 - length_cv) / 0.15))
+    length_score = max(0.0, min(1.0, (0.25 - length_cv) / 0.25))
     monotony = max(opener_score, length_score)
 
     if opener_repetition > 0.4 or length_cv < 0.25:
+        offset = 0
         for para in paragraphs:
-            start = text.find(para)
+            start = text.find(para, offset)
             if start == -1:
                 continue
+            offset = start + len(para)
             flags.append(FlaggedSpan(
                 start=start,
                 end=start + len(para),
@@ -294,6 +296,7 @@ def _score_specificity(text: str, paragraphs: list[str]) -> tuple[float, list[Fl
 
     all_sentences = []
     specific_count = 0
+    offset = 0
 
     for para in paragraphs:
         sentences = split_sentences(para)
@@ -305,9 +308,10 @@ def _score_specificity(text: str, paragraphs: list[str]) -> tuple[float, list[Fl
                 para_has_specific = True
 
         if not para_has_specific and sentences:
-            start = text.find(para)
+            start = text.find(para, offset)
             if start == -1:
                 continue
+            offset = start + len(para)
             flags.append(FlaggedSpan(
                 start=start,
                 end=start + len(para),
@@ -319,6 +323,11 @@ def _score_specificity(text: str, paragraphs: list[str]) -> tuple[float, list[Fl
                 ),
                 suggestion="Add a concrete number, date, name, or example.",
             ))
+        else:
+            # Advance offset even if para has specifics
+            pos = text.find(para, offset)
+            if pos != -1:
+                offset = pos + len(para)
 
     if not all_sentences:
         return 0.0, flags

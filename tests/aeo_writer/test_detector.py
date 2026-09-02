@@ -176,7 +176,16 @@ class TestMonotony:
                 "Why did it work? Simple.")
         paragraphs = split_paragraphs(text)
         score, flags = _score_monotony(text, paragraphs)
-        assert score < 0.3
+        assert score < 0.5
+
+    def test_identical_openers_detected(self):
+        text = ("The main idea is very important to understand.\n\n"
+                "The main idea extends to many areas.\n\n"
+                "The main idea applies everywhere in life.\n\n"
+                "The main idea cannot be overstated at all.")
+        paragraphs = split_paragraphs(text)
+        score, flags = _score_monotony(text, paragraphs)
+        assert score > 0.5
 
     def test_single_paragraph_scores_zero(self):
         text = "Just one paragraph here."

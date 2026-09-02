@@ -120,20 +120,26 @@ function renderSignalScores() {
 }
 
 function renderCleanView() {
-  document.getElementById('clean-view').innerHTML = mdToHtml(DATA.text);
+  const safe = DATA.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  document.getElementById('clean-view').innerHTML = mdToHtml(safe);
 }
 
 function applyFlags(text, flags) {
-  const sorted = [...flags].sort((a, b) => b.start - a.start);
-  let html = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const offsets = [];
+  const sorted = [...flags].sort((a, b) => a.start - b.start);
+  let html = '';
+  let cursor = 0;
   for (const f of sorted) {
-    const before = html.slice(0, f.start);
-    const span = html.slice(f.start, f.end);
-    const after = html.slice(f.end);
+    if (f.start > cursor) {
+      html += esc(text.slice(cursor, f.start));
+    }
+    const flagText = esc(text.slice(f.start, f.end));
     const cls = `flag flag-${f.signal}`;
     const tip = `<div class="tooltip"><div class="signal-label" style="color:${SIGNAL_COLORS[f.signal]}">${esc(f.signal)}</div>${esc(f.annotation)}${f.suggestion ? `<div class="suggestion">${esc(f.suggestion)}</div>` : ''}</div>`;
-    html = before + `<span class="${cls}" contenteditable="true">${span}${tip}</span>` + after;
+    html += `<span class="${cls}" contenteditable="true">${flagText}${tip}</span>`;
+    cursor = f.end;
+  }
+  if (cursor < text.length) {
+    html += esc(text.slice(cursor));
   }
   return html;
 }
@@ -163,7 +169,11 @@ function render() {
 
 function collectText() {
   const blocks = document.querySelectorAll('#flagged-view .para-block');
-  return Array.from(blocks).map(b => b.textContent.trim()).join('\n\n');
+  return Array.from(blocks).map(b => {
+    const clone = b.cloneNode(true);
+    clone.querySelectorAll('.tooltip').forEach(t => t.remove());
+    return clone.textContent.trim();
+  }).join('\n\n');
 }
 
 document.getElementById('btn-recheck').addEventListener('click', async () => {

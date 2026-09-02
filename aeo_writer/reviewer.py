@@ -131,4 +131,5 @@ def start_review(result: DetectionResult, mode: str = "detect", open_browser: bo
     server = ReviewServer(result, mode=mode, open_browser=open_browser)
     print(f"Review UI: http://127.0.0.1:{server.port}/")
     server.serve_until_approved()
+    server.shutdown()
     return server.approved_text

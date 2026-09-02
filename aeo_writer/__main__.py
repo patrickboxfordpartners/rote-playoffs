@@ -43,6 +43,30 @@ def _read_input(path_or_url: str) -> str:
         return f.read()
 
 
+def _fraud_summary(result):
+    """Generate educational summary when multiple signals indicate templated/mass-produced content."""
+    elevated = [k for k, v in result.signal_scores.items() if v > 0.5]
+    if result.risk_level != "WEAK" or len(elevated) < 3:
+        return ""
+
+    signal_descriptions = {
+        "burstiness": "uniform sentence rhythm",
+        "vocabulary": "overused filler words",
+        "hedging": "excessive hedging instead of definitive claims",
+        "monotony": "repetitive paragraph structure",
+        "specificity": "no concrete details, numbers, or examples",
+    }
+    issues = [signal_descriptions.get(s, s) for s in elevated]
+
+    return (
+        "\n*** CONTENT QUALITY ALERT ***\n"
+        "This content shows patterns common in mass-produced or templated writing:\n"
+        + "".join(f"  - {issue}\n" for issue in issues)
+        + "AI assistants skip content like this because they can't verify or cite\n"
+        "vague, generic claims. Each flagged section above explains what to fix.\n"
+    )
+
+
 def _format_report(result) -> str:
     lines = []
     lines.append("=" * 60)
@@ -92,7 +116,14 @@ def cmd_detect(args):
 
     if args.no_browser:
         print(_format_report(result))
+        fraud_alert = _fraud_summary(result)
+        if fraud_alert:
+            print(fraud_alert)
         return
+
+    fraud_alert = _fraud_summary(result)
+    if fraud_alert:
+        print(fraud_alert)
 
     edited = start_review(result, mode="detect", open_browser=True)
     if edited:

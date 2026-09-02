@@ -74,6 +74,8 @@ const SIGNAL_COLORS = {
 };
 let DATA = null;
 
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 async function loadData() {
   const resp = await fetch('/api/data');
   DATA = await resp.json();
@@ -113,7 +115,7 @@ function renderSignalScores() {
   el.innerHTML = Object.entries(DATA.signal_scores).map(([k, v]) => {
     const pct = Math.round((1 - v) * 100);
     const color = SIGNAL_COLORS[k] || '#888';
-    return `<div class="signal-score"><span>${k}</span><div class="signal-bar"><div class="signal-fill" style="width:${pct}%;background:${color}"></div></div><span>${pct}%</span></div>`;
+    return `<div class="signal-score"><span>${esc(k)}</span><div class="signal-bar"><div class="signal-fill" style="width:${pct}%;background:${color}"></div></div><span>${pct}%</span></div>`;
   }).join('');
 }
 
@@ -130,7 +132,7 @@ function applyFlags(text, flags) {
     const span = html.slice(f.start, f.end);
     const after = html.slice(f.end);
     const cls = `flag flag-${f.signal}`;
-    const tip = `<div class="tooltip"><div class="signal-label" style="color:${SIGNAL_COLORS[f.signal]}">${f.signal}</div>${f.annotation}${f.suggestion ? `<div class="suggestion">${f.suggestion}</div>` : ''}</div>`;
+    const tip = `<div class="tooltip"><div class="signal-label" style="color:${SIGNAL_COLORS[f.signal]}">${esc(f.signal)}</div>${esc(f.annotation)}${f.suggestion ? `<div class="suggestion">${esc(f.suggestion)}</div>` : ''}</div>`;
     html = before + `<span class="${cls}" contenteditable="true">${span}${tip}</span>` + after;
   }
   return html;

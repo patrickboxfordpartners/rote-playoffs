@@ -8,7 +8,6 @@ import threading
 import webbrowser
 from dataclasses import asdict
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from string import Template
 
 from .detector import DetectionResult, analyze
 

@@ -4,7 +4,6 @@ import argparse
 import json
 import os
 import sys
-from dataclasses import asdict
 from urllib.request import Request, urlopen
 from urllib.error import URLError
 
@@ -95,7 +94,7 @@ def cmd_detect(args):
         print(_format_report(result))
         return
 
-    edited = start_review(result, mode="detect")
+    edited = start_review(result, mode="detect", open_browser=True)
     if edited:
         out_path = args.input + ".reviewed.md" if not args.input.startswith("http") else "reviewed.md"
         with open(out_path, "w") as f:
@@ -130,7 +129,7 @@ def cmd_write(args):
 
     final_text = draft
     if not args.no_review:
-        edited = start_review(result, mode="write")
+        edited = start_review(result, mode="write", open_browser=True)
         if edited:
             final_text = edited
             result2 = analyze(final_text)
@@ -150,7 +149,7 @@ def cmd_write(args):
         title = final_text.split("\n")[0].lstrip("#").strip() or args.topic
         tags = keywords[:5] if keywords else []
         print(f"\nPublishing to Medium...")
-        pub = publish_to_medium(title, final_text, tags, token, args.publish)
+        pub = publish_to_medium(title, final_text, tags, token, args.publish, canonical_url=args.target_url)
         if "url" in pub:
             print(f"Published: {pub['url']}")
         else:
@@ -160,6 +159,8 @@ def cmd_write(args):
                 f.write(final_text)
             print(f"Saved to {fallback}")
     else:
+        if args.publish:
+            print("Warning: --publish was specified but no MEDIUM_TOKEN is set. Saving to file instead.", file=sys.stderr)
         fallback = f"drafts/{slug}-final.md"
         with open(fallback, "w") as f:
             f.write(final_text)

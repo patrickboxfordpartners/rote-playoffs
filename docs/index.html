@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEO Toolkit — Make Your Content Visible to AI | Boxford Partners</title>
+  <meta name="description" content="Free, open-source tools that audit and improve how AI assistants see your website. Get an AI Readiness Score, content quality analysis, and agent readiness check in one command.">
+  <meta property="og:title" content="AEO Toolkit — Make Your Content Visible to AI">
+  <meta property="og:description" content="Free, open-source tools that audit and improve how AI assistants see your website. One URL in, complete diagnosis out.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://patrickboxfordpartners.github.io/rote-playoffs/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AEO Toolkit — Make Your Content Visible to AI">
+  <meta name="twitter:description" content="Free, open-source tools that audit and improve how AI assistants see your website.">
+  <link rel="canonical" href="https://patrickboxfordpartners.github.io/rote-playoffs/">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "AEO Toolkit",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Cross-platform",
+    "description": "Three open-source tools that audit and improve how AI assistants see your website. Technical visibility scoring, content quality analysis, and agent readiness checks.",
+    "url": "https://patrickboxfordpartners.github.io/rote-playoffs/",
+    "author": {
+      "@type": "Organization",
+      "name": "Boxford Partners",
+      "url": "https://www.boxfordpartners.com",
+      "sameAs": [
+        "https://github.com/patrickboxfordpartners"
+      ]
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is AEO and how is it different from SEO?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "SEO (Search Engine Optimization) helps your website rank in traditional search results — the list of blue links on Google. AEO (Answer Engine Optimization) helps your content get cited by AI assistants like ChatGPT, Perplexity, Claude, and Google AI Overviews. When someone asks an AI a question about your industry, AEO is what determines whether the AI references your business or your competitor. They solve different problems: SEO gets you on the list, AEO makes you the answer."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why should my business care about AI visibility?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "AI assistants now influence buying decisions for millions of people. When a potential customer asks ChatGPT or Perplexity for a recommendation in your industry, those systems pull from websites they can read and understand. If your site isn't optimized for AI crawlers, your business is invisible to this growing audience. This isn't about gaming the system — it's about making sure your legitimate expertise is accessible to the tools people are already using."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do I need to be technical to use this?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You need to be comfortable running a command in a terminal, but that's it. The toolkit is one command: type your URL, and it opens a visual dashboard in your browser with scores, explanations, and specific recommendations. Every recommendation includes plain-language context explaining why it matters and what to do about it. No coding required to understand or act on the results."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does the AI Readiness Score mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The AI Readiness Score is a 0-100 grade combining three dimensions. Technical Visibility checks whether AI crawlers can access your site, find structured data, and read your content. Content Quality measures whether your writing style is the kind AI assistants prefer to cite — specific, concrete, and authoritative rather than vague or templated. Agent Readiness checks whether AI agents (not just chatbots) can interact with your site. A score above 70 means you're in good shape. Below 50 means AI assistants are likely skipping over your content."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I improve my score?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The dashboard gives you a prioritized list of specific actions ranked by impact. Common improvements include adding structured data (JSON-LD schema markup) so AI can understand what your business does, creating an llms.txt file that tells AI crawlers what's on your site, improving content specificity by replacing vague claims with concrete numbers and examples, and adding FAQ sections with direct answers to common questions. Each recommendation includes copy-paste code when applicable."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my data shared or stored anywhere?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. The core audit runs entirely on your machine using Python standard library — no data leaves your computer. It fetches your public website the same way any browser would, scores it locally, and shows you the results. If you enable the optional multi-agent mode with API keys, those queries go to the respective API providers (Firecrawl, OpenAI, or Anthropic) under their standard terms, but the toolkit itself stores nothing remotely."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What does the content quality analysis measure?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The content quality engine analyzes five signals that determine whether AI assistants will cite your writing. Burstiness measures sentence length variation — real writers naturally mix short and long sentences. Vocabulary checks for overused filler words like 'leverage' and 'comprehensive' that signal templated content. Hedging detects weak qualifiers like 'it's possible that' — AI prefers definitive statements. Monotony measures repetitive paragraph structure. Specificity looks for concrete details like numbers, names, and data points that make content worth citing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How often should I run an AEO audit?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Run a baseline audit now to understand where you stand. After that, run it again whenever you make significant content or technical changes to your site — new pages, redesigns, CMS migrations, or content rewrites. For businesses actively working on their AI visibility, a monthly check keeps you on track. The multi-agent mode can track changes between scans so you can see whether your improvements are working."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I use this with my existing website?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The toolkit audits any public URL regardless of what platform or CMS you use — WordPress, Shopify, Squarespace, Wix, custom-built, or anything else. It reads your site the same way AI crawlers do and tells you what they see. The recommendations work with any platform, though some (like adding JSON-LD markup) may be easier on certain CMSes than others."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is agent readiness and why does it matter?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Agent readiness is the next frontier beyond basic AI visibility. Today's AI chatbots read your site passively. Tomorrow's AI agents will try to interact with it — booking appointments, checking inventory, comparing prices, filling out forms. Agent readiness measures whether your site is prepared for that shift: does it have discoverable API endpoints, proper authentication flows, structured responses, and machine-readable interfaces? Businesses that score well on agent readiness now will have a significant advantage as AI agents become mainstream."
+        }
+      }
+    ],
+    "author": {
+      "@id": "https://www.boxfordpartners.com/#organization"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: #111111;
+      --bg-card-hover: #1a1a1a;
+      --border: #222222;
+      --text: #f5f5f5;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --emerald: #10b981;
+      --emerald-dim: #059669;
+      --emerald-glow: rgba(16, 185, 129, 0.1);
+      --radius: 12px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--emerald); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    /* Nav */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(10, 10, 10, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 0;
+    }
+    nav .container { display: flex; align-items: center; justify-content: space-between; }
+    nav .brand { font-weight: 700; font-size: 1rem; color: var(--text); }
+    nav .brand span { color: var(--emerald); }
+    nav .links { display: flex; gap: 20px; font-size: 0.875rem; }
+    nav .links a { color: var(--text-muted); }
+    nav .links a:hover { color: var(--emerald); text-decoration: none; }
+
+    /* Hero */
+    .hero {
+      padding: 100px 0 80px;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.06) 0%, transparent 60%);
+    }
+    .hero .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--emerald);
+      padding: 6px 16px;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      letter-spacing: -0.02em;
+    }
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto 32px;
+    }
+    .hero-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      transition: all 0.2s;
+      border: none; cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--emerald);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--emerald-dim); text-decoration: none; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--text-dim); color: var(--text); text-decoration: none; }
+
+    /* Section */
+    section { padding: 80px 0; }
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--emerald);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 1.0625rem;
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* What is AEO */
+    .what-is-aeo {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-card) 100%);
+    }
+    .explainer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-top: 32px;
+    }
+    .explainer-card {
+      padding: 28px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .explainer-card h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .explainer-card p { color: var(--text-muted); font-size: 0.9375rem; }
+
+    /* Features */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .feature-card {
+      padding: 28px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .feature-card:hover { border-color: rgba(16, 185, 129, 0.3); background: var(--bg-card-hover); }
+    .feature-icon {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      background: var(--emerald-glow);
+      color: var(--emerald);
+      font-size: 1.25rem;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; }
+    .feature-card p { color: var(--text-muted); font-size: 0.875rem; line-height: 1.65; }
+    .feature-tag {
+      display: inline-block;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--emerald);
+      background: var(--emerald-glow);
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-top: 12px;
+    }
+
+    /* Quick Start */
+    .quickstart {
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .code-block {
+      background: #0d0d0d;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      overflow-x: auto;
+      margin-top: 24px;
+    }
+    .code-block pre {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, monospace;
+      font-size: 0.875rem;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+    .code-block .comment { color: var(--text-dim); }
+    .code-block .cmd { color: var(--text); }
+    .code-block .flag { color: var(--emerald); }
+
+    /* FAQ */
+    .faq-section { border-bottom: 1px solid var(--border); }
+    .faq-list { max-width: 720px; }
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .faq-item.open { border-color: rgba(16, 185, 129, 0.3); }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 20px 24px;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+      line-height: 1.4;
+    }
+    .faq-question:hover { background: rgba(255,255,255,0.02); }
+    .faq-chevron {
+      flex-shrink: 0;
+      width: 20px; height: 20px;
+      margin-left: 16px;
+      transition: transform 0.25s ease;
+      color: var(--text-dim);
+    }
+    .faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--emerald); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+    .faq-item.open .faq-answer { max-height: 500px; }
+    .faq-answer-inner {
+      padding: 0 24px 20px;
+      color: var(--text-muted);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 100%, rgba(16, 185, 129, 0.06) 0%, transparent 60%);
+    }
+    .cta-section .section-title { max-width: 500px; margin: 0 auto 16px; }
+
+    /* Footer */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.8125rem;
+    }
+    footer a { color: var(--text-muted); }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero { padding: 72px 0 56px; }
+      section { padding: 56px 0; }
+      .features-grid { grid-template-columns: 1fr; }
+      .explainer-grid { grid-template-columns: 1fr; }
+      nav .links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="https://www.boxfordpartners.com" class="brand">Boxford <span>Partners</span></a>
+      <div class="links">
+        <a href="#what-is-aeo">What is AEO</a>
+        <a href="#tools">Tools</a>
+        <a href="#quickstart">Quick Start</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/patrickboxfordpartners/rote-playoffs">GitHub</a>
+        <a href="https://www.boxfordpartners.com/tools/aeo">Boxford Partners</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="badge">Open Source &middot; Free &middot; No API Keys Required</div>
+      <h1>Make Your Content<br>Visible to AI</h1>
+      <p>Three tools that audit and improve how AI assistants see your website. One URL in, complete diagnosis out. Built for businesses that want to understand their AI presence, not game it.</p>
+      <div class="hero-buttons">
+        <a href="#quickstart" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+          Get Started
+        </a>
+        <a href="https://github.com/patrickboxfordpartners/rote-playoffs" class="btn btn-secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          View on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- What is AEO -->
+  <section class="what-is-aeo" id="what-is-aeo">
+    <div class="container">
+      <div class="section-label">Understanding the shift</div>
+      <h2 class="section-title">What is Answer Engine Optimization?</h2>
+      <p class="section-subtitle">AI assistants are changing how people find businesses. AEO is how you make sure yours gets found.</p>
+
+      <div class="explainer-grid">
+        <div class="explainer-card">
+          <h3>SEO Gets You on the List</h3>
+          <p>Traditional SEO optimizes for search engines that return a list of links. You compete for position on a page of ten results. The user clicks through and reads your site.</p>
+        </div>
+        <div class="explainer-card">
+          <h3>AEO Makes You the Answer</h3>
+          <p>AEO optimizes for AI assistants that return a direct answer. When someone asks ChatGPT or Perplexity a question in your industry, AEO determines whether the AI cites your business or skips it entirely.</p>
+        </div>
+        <div class="explainer-card">
+          <h3>It's About Citability, Not Tricks</h3>
+          <p>AEO isn't about gaming algorithms. It's about making your real expertise accessible to AI systems: structured data they can parse, content specific enough to cite, and technical access they can navigate.</p>
+        </div>
+        <div class="explainer-card">
+          <h3>Most Businesses Don't Know Their Score</h3>
+          <p>You probably know your Google ranking. Do you know whether AI assistants can even read your site? Most businesses have never checked. This toolkit gives you that baseline in under a minute.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tools -->
+  <section id="tools">
+    <div class="container">
+      <div class="section-label">The Toolkit</div>
+      <h2 class="section-title">Three Tools, One Mission</h2>
+      <p class="section-subtitle">Each tool works standalone. Together they give you a complete picture of your AI visibility.</p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <h3>AEO Pipeline</h3>
+          <p>The full scan. Enter a URL, get an interactive dashboard with technical visibility, content quality, and agent readiness scores. Side-by-side view with your site, downloadable report, and plain-language explanations of every signal.</p>
+          <span class="feature-tag">No API keys needed</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <h3>AI Visibility Audit</h3>
+          <p>Checks what AI crawlers see when they visit your site: robots.txt rules, llms.txt files, structured data, schema markup, content structure, and entity signals. Returns a 0-100 score with copy-paste fix recommendations.</p>
+          <span class="feature-tag">Technical depth</span>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <h3>Content Quality Engine</h3>
+          <p>Analyzes your writing against five signals AI assistants use when deciding what to cite: sentence variation, vocabulary specificity, hedging density, structural variety, and concrete detail. Works on files or URLs.</p>
+          <span class="feature-tag">Content analysis</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start -->
+  <section class="quickstart" id="quickstart">
+    <div class="container">
+      <div class="section-label">Get Started in 60 Seconds</div>
+      <h2 class="section-title">Quick Start</h2>
+      <p class="section-subtitle">Python 3.10+ required. No pip install needed for the core audit.</p>
+
+      <div class="code-block">
+        <pre><span class="comment"># Clone the repository</span>
+<span class="cmd">git clone https://github.com/patrickboxfordpartners/rote-playoffs.git</span>
+<span class="cmd">cd rote-playoffs</span>
+
+<span class="comment"># Run the full AI readiness scan on any URL</span>
+<span class="cmd">python3 -m aeo_pipeline <span class="flag">yoursite.com</span></span>
+
+<span class="comment"># That's it. A dashboard opens in your browser.</span>
+
+<span class="comment"># Optional: enable multi-agent mode for LLM-generated insights</span>
+<span class="cmd">pip install firecrawl-py</span>
+<span class="cmd">export FIRECRAWL_API_KEY=<span class="flag">fc-...</span></span>
+<span class="cmd">python3 -m aeo_pipeline <span class="flag">yoursite.com</span> --agents</span>
+
+<span class="comment"># Run as a Rote Play (hackathon registry)</span>
+<span class="cmd">rote play run aeo-pipeline <span class="flag">'url=yoursite.com'</span></span></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      <div class="section-label">Common Questions</div>
+      <h2 class="section-title">FAQ</h2>
+      <p class="section-subtitle">Everything you need to know about AEO and this toolkit, in plain language.</p>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What is AEO and how is it different from SEO?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">SEO (Search Engine Optimization) helps your website rank in traditional search results — the list of blue links on Google. AEO (Answer Engine Optimization) helps your content get cited by AI assistants like ChatGPT, Perplexity, Claude, and Google AI Overviews. When someone asks an AI a question about your industry, AEO is what determines whether the AI references your business or your competitor. They solve different problems: SEO gets you on the list, AEO makes you the answer.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Why should my business care about AI visibility?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">AI assistants now influence buying decisions for millions of people. When a potential customer asks ChatGPT or Perplexity for a recommendation in your industry, those systems pull from websites they can read and understand. If your site isn't optimized for AI crawlers, your business is invisible to this growing audience. This isn't about gaming the system — it's about making sure your legitimate expertise is accessible to the tools people are already using.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Do I need to be technical to use this?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">You need to be comfortable running a command in a terminal, but that's it. The toolkit is one command: type your URL, and it opens a visual dashboard in your browser with scores, explanations, and specific recommendations. Every recommendation includes plain-language context explaining why it matters and what to do about it. No coding required to understand or act on the results.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What does the AI Readiness Score mean?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">The AI Readiness Score is a 0&ndash;100 grade combining three dimensions. Technical Visibility checks whether AI crawlers can access your site, find structured data, and read your content. Content Quality measures whether your writing style is the kind AI assistants prefer to cite — specific, concrete, and authoritative rather than vague or templated. Agent Readiness checks whether AI agents (not just chatbots) can interact with your site. A score above 70 means you're in good shape. Below 50 means AI assistants are likely skipping over your content.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How do I improve my score?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">The dashboard gives you a prioritized list of specific actions ranked by impact. Common improvements include adding structured data (JSON-LD schema markup) so AI can understand what your business does, creating an llms.txt file that tells AI crawlers what's on your site, improving content specificity by replacing vague claims with concrete numbers and examples, and adding FAQ sections with direct answers to common questions. Each recommendation includes copy-paste code when applicable.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Is my data shared or stored anywhere?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">No. The core audit runs entirely on your machine using Python standard library — no data leaves your computer. It fetches your public website the same way any browser would, scores it locally, and shows you the results. If you enable the optional multi-agent mode with API keys, those queries go to the respective API providers (Firecrawl, OpenAI, or Anthropic) under their standard terms, but the toolkit itself stores nothing remotely.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What does the content quality analysis measure?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">The content quality engine analyzes five signals that determine whether AI assistants will cite your writing. Burstiness measures sentence length variation — real writers naturally mix short and long sentences. Vocabulary checks for overused filler words that signal templated content. Hedging detects weak qualifiers — AI prefers definitive statements. Monotony measures repetitive paragraph structure. Specificity looks for concrete details like numbers, names, and data points that make content worth citing.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            How often should I run an AEO audit?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Run a baseline audit now to understand where you stand. After that, run it again whenever you make significant content or technical changes to your site — new pages, redesigns, CMS migrations, or content rewrites. For businesses actively working on their AI visibility, a monthly check keeps you on track. The multi-agent mode can track changes between scans so you can see whether your improvements are working.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            Can I use this with my existing website?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Yes. The toolkit audits any public URL regardless of what platform or CMS you use — WordPress, Shopify, Squarespace, Wix, custom-built, or anything else. It reads your site the same way AI crawlers do and tells you what they see. The recommendations work with any platform, though some (like adding JSON-LD markup) may be easier on certain CMSes than others.</div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)">
+            What is agent readiness and why does it matter?
+            <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </button>
+          <div class="faq-answer"><div class="faq-answer-inner">Agent readiness is the next frontier beyond basic AI visibility. Today's AI chatbots read your site passively. Tomorrow's AI agents will try to interact with it — booking appointments, checking inventory, comparing prices, filling out forms. Agent readiness measures whether your site is prepared for that shift: does it have discoverable API endpoints, proper authentication flows, structured responses, and machine-readable interfaces? Businesses that score well on agent readiness now will have a significant advantage as AI agents become mainstream.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container" style="text-align:center;">
+      <div class="section-label">Built by Boxford Partners</div>
+      <h2 class="section-title">Find Out What AI Sees When It Looks at Your Site</h2>
+      <p style="color:var(--text-muted); max-width:520px; margin:0 auto 32px; font-size:1.0625rem;">Run a free audit in under a minute. No account required, no data stored, no strings attached.</p>
+      <div class="hero-buttons">
+        <a href="#quickstart" class="btn btn-primary">Run Your Audit</a>
+        <a href="https://www.boxfordpartners.com/tools/aeo" class="btn btn-secondary">Learn More at Boxford Partners</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p style="margin-bottom:8px;">
+        <a href="https://www.boxfordpartners.com">Boxford Partners</a> &middot;
+        <a href="https://github.com/patrickboxfordpartners/rote-playoffs">GitHub</a> &middot;
+        <a href="https://www.boxfordpartners.com/tools/aeo">AEO Toolkit</a>
+      </p>
+      <p>Built for the <a href="https://rote.dev/playoffs">Rote Playoffs Hackathon</a> (Sep 2026) by <a href="https://www.boxfordpartners.com">Patrick Mitchell</a>.</p>
+    </div>
+  </footer>
+
+  <script>
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      const wasOpen = item.classList.contains('open');
+      // Close all
+      document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+      // Toggle clicked
+      if (!wasOpen) item.classList.add('open');
+    }
+  </script>
+
+</body>
+</html>

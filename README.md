@@ -226,6 +226,12 @@ All three tools are packaged as [Rote](https://rote.dev) plays for the hackathon
 | `ai-visibility-audit` | `url` (required) | None |
 | `aeo-writer` | `command`, `input` (required); `target_url`, `keywords` (optional) | None for detect; `ANTHROPIC_API_KEY` for write |
 
+## Links
+
+- [AEO Toolkit Landing Page](https://patrickboxfordpartners.github.io/rote-playoffs/) — Interactive guide with FAQ
+- [Boxford Partners AEO Tools](https://www.boxfordpartners.com/tools/aeo) — Learn more about AEO and how we use it
+- [Rote Play Registry](https://play.modiqo.ai/patrickmitchell/aeo-pipeline@2.0.0) — Run directly via Rote
+
 ---
 
 Built for the [Rote Playoffs Hackathon](https://rote.dev/playoffs) (Sep 1-6, 2026) by [Patrick Mitchell](https://boxfordpartners.com).

@@ -13,6 +13,9 @@
   <meta name="twitter:title" content="AEO Toolkit — Make Your Content Visible to AI">
   <meta name="twitter:description" content="Free, open-source tools that audit and improve how AI assistants see your website.">
   <link rel="canonical" href="https://patrickboxfordpartners.github.io/rote-playoffs/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <script type="application/ld+json">
   {
@@ -135,23 +138,27 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg: #0a0a0a;
-      --bg-card: #111111;
-      --bg-card-hover: #1a1a1a;
-      --border: #222222;
-      --text: #f5f5f5;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
-      --emerald: #10b981;
-      --emerald-dim: #059669;
-      --emerald-glow: rgba(16, 185, 129, 0.1);
+      --background: #edeef0;
+      --foreground: #1c2030;
+      --card: #ffffff;
+      --card-hover: #f9f9fa;
+      --border: #d9dade;
+      --muted-foreground: #626878;
+      --surface-tint: #f6f6f7;
+      --surface-dark: #161a24;
+      --surface-dark-foreground: #e5e7ea;
+      --surface-dark-muted: #929498;
+      --surface-dark-border: rgba(255, 255, 255, 0.06);
+      --emerald: #219e6e;
+      --emerald-light: #28b57e;
+      --emerald-glow: rgba(33, 158, 110, 0.08);
       --radius: 12px;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
@@ -161,26 +168,27 @@
 
     .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
 
-    /* Nav */
+    /* Nav — dark */
     nav {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(10, 10, 10, 0.85);
+      background: rgba(22, 26, 36, 0.92);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--surface-dark-border);
       padding: 16px 0;
     }
     nav .container { display: flex; align-items: center; justify-content: space-between; }
-    nav .brand { font-weight: 700; font-size: 1rem; color: var(--text); }
+    nav .brand { font-weight: 700; font-size: 1rem; color: var(--surface-dark-foreground); }
     nav .brand span { color: var(--emerald); }
     nav .links { display: flex; gap: 20px; font-size: 0.875rem; }
-    nav .links a { color: var(--text-muted); }
+    nav .links a { color: var(--surface-dark-muted); }
     nav .links a:hover { color: var(--emerald); text-decoration: none; }
 
-    /* Hero */
+    /* Hero — dark */
     .hero {
       padding: 100px 0 80px;
       text-align: center;
-      background: radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.06) 0%, transparent 60%);
+      background: var(--surface-dark);
+      color: var(--surface-dark-foreground);
     }
     .hero .badge {
       display: inline-block;
@@ -190,7 +198,7 @@
       letter-spacing: 0.1em;
       color: var(--emerald);
       padding: 6px 16px;
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border: 1px solid rgba(33, 158, 110, 0.3);
       border-radius: 100px;
       margin-bottom: 24px;
     }
@@ -200,10 +208,11 @@
       line-height: 1.1;
       margin-bottom: 20px;
       letter-spacing: -0.02em;
+      color: var(--surface-dark-foreground);
     }
     .hero p {
       font-size: 1.125rem;
-      color: var(--text-muted);
+      color: var(--surface-dark-muted);
       max-width: 600px;
       margin: 0 auto 32px;
     }
@@ -216,18 +225,19 @@
       font-weight: 600;
       transition: all 0.2s;
       border: none; cursor: pointer;
+      font-family: inherit;
     }
     .btn-primary {
       background: var(--emerald);
       color: #fff;
     }
-    .btn-primary:hover { background: var(--emerald-dim); text-decoration: none; }
+    .btn-primary:hover { background: var(--emerald-light); text-decoration: none; box-shadow: 0 4px 12px rgba(33, 158, 110, 0.2); }
     .btn-secondary {
       background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--border);
+      color: var(--surface-dark-muted);
+      border: 1px solid var(--surface-dark-border);
     }
-    .btn-secondary:hover { border-color: var(--text-dim); color: var(--text); text-decoration: none; }
+    .btn-secondary:hover { border-color: var(--surface-dark-muted); color: var(--surface-dark-foreground); text-decoration: none; }
 
     /* Section */
     section { padding: 80px 0; }
@@ -235,7 +245,7 @@
       font-size: 0.75rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
       color: var(--emerald);
       margin-bottom: 12px;
     }
@@ -244,40 +254,43 @@
       font-weight: 700;
       margin-bottom: 16px;
       letter-spacing: -0.01em;
+      color: var(--foreground);
     }
     .section-subtitle {
-      color: var(--text-muted);
+      color: var(--muted-foreground);
       font-size: 1.0625rem;
       max-width: 600px;
       margin-bottom: 48px;
     }
 
-    /* What is AEO */
+    /* What is AEO — light canvas */
     .what-is-aeo {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-card) 100%);
+      background: var(--background);
     }
     .explainer-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 32px;
+      gap: 24px;
       margin-top: 32px;
     }
     .explainer-card {
       padding: 28px;
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      background: var(--bg);
+      background: var(--card);
     }
     .explainer-card h3 {
       font-size: 1.125rem;
       font-weight: 600;
       margin-bottom: 8px;
+      color: var(--foreground);
     }
-    .explainer-card p { color: var(--text-muted); font-size: 0.9375rem; }
+    .explainer-card p { color: var(--muted-foreground); font-size: 0.9375rem; }
 
-    /* Features */
+    /* Features — surface-tint alternating */
+    .tools-section {
+      background: var(--surface-tint);
+    }
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -287,10 +300,10 @@
       padding: 28px;
       border-radius: var(--radius);
       border: 1px solid var(--border);
-      background: var(--bg-card);
-      transition: border-color 0.2s, background 0.2s;
+      background: var(--card);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .feature-card:hover { border-color: rgba(16, 185, 129, 0.3); background: var(--bg-card-hover); }
+    .feature-card:hover { border-color: rgba(33, 158, 110, 0.3); box-shadow: 0 2px 12px rgba(0,0,0,0.04); }
     .feature-icon {
       width: 40px; height: 40px;
       display: flex; align-items: center; justify-content: center;
@@ -300,8 +313,8 @@
       font-size: 1.25rem;
       margin-bottom: 16px;
     }
-    .feature-card h3 { font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; }
-    .feature-card p { color: var(--text-muted); font-size: 0.875rem; line-height: 1.65; }
+    .feature-card h3 { font-size: 1.0625rem; font-weight: 600; margin-bottom: 8px; color: var(--foreground); }
+    .feature-card p { color: var(--muted-foreground); font-size: 0.875rem; line-height: 1.65; }
     .feature-tag {
       display: inline-block;
       font-size: 0.6875rem;
@@ -315,32 +328,36 @@
       margin-top: 12px;
     }
 
-    /* Quick Start */
+    /* Quick Start — dark */
     .quickstart {
-      background: var(--bg-card);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
+      background: var(--surface-dark);
+      color: var(--surface-dark-foreground);
     }
+    .quickstart .section-label { color: var(--emerald); }
+    .quickstart .section-title { color: var(--surface-dark-foreground); }
+    .quickstart .section-subtitle { color: var(--surface-dark-muted); }
     .code-block {
-      background: #0d0d0d;
-      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--surface-dark-border);
       border-radius: var(--radius);
       padding: 24px;
       overflow-x: auto;
       margin-top: 24px;
     }
     .code-block pre {
-      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, monospace;
+      font-family: 'JetBrains Mono', 'Geist Mono', monospace;
       font-size: 0.875rem;
       line-height: 1.8;
-      color: var(--text-muted);
+      color: var(--surface-dark-muted);
     }
-    .code-block .comment { color: var(--text-dim); }
-    .code-block .cmd { color: var(--text); }
+    .code-block .comment { color: rgba(146, 148, 152, 0.6); }
+    .code-block .cmd { color: var(--surface-dark-foreground); }
     .code-block .flag { color: var(--emerald); }
 
-    /* FAQ */
-    .faq-section { border-bottom: 1px solid var(--border); }
+    /* FAQ — light canvas */
+    .faq-section {
+      background: var(--background);
+    }
     .faq-list { max-width: 720px; }
     .faq-item {
       border: 1px solid var(--border);
@@ -348,8 +365,9 @@
       margin-bottom: 12px;
       overflow: hidden;
       transition: border-color 0.2s;
+      background: var(--card);
     }
-    .faq-item.open { border-color: rgba(16, 185, 129, 0.3); }
+    .faq-item.open { border-color: rgba(33, 158, 110, 0.4); }
     .faq-question {
       display: flex;
       align-items: center;
@@ -358,7 +376,7 @@
       padding: 20px 24px;
       background: transparent;
       border: none;
-      color: var(--text);
+      color: var(--foreground);
       font-size: 1rem;
       font-weight: 600;
       text-align: left;
@@ -367,13 +385,13 @@
       font-family: inherit;
       line-height: 1.4;
     }
-    .faq-question:hover { background: rgba(255,255,255,0.02); }
+    .faq-question:hover { background: var(--surface-tint); }
     .faq-chevron {
       flex-shrink: 0;
       width: 20px; height: 20px;
       margin-left: 16px;
       transition: transform 0.25s ease;
-      color: var(--text-dim);
+      color: var(--muted-foreground);
     }
     .faq-item.open .faq-chevron { transform: rotate(180deg); color: var(--emerald); }
     .faq-answer {
@@ -384,27 +402,36 @@
     .faq-item.open .faq-answer { max-height: 500px; }
     .faq-answer-inner {
       padding: 0 24px 20px;
-      color: var(--text-muted);
+      color: var(--muted-foreground);
       font-size: 0.9375rem;
       line-height: 1.7;
     }
 
-    /* CTA */
+    /* AEO in Practice — surface-tint */
+    .practice-section {
+      background: var(--surface-tint);
+    }
+
+    /* CTA — dark */
     .cta-section {
       text-align: center;
-      background: radial-gradient(ellipse at 50% 100%, rgba(16, 185, 129, 0.06) 0%, transparent 60%);
+      background: var(--surface-dark);
+      color: var(--surface-dark-foreground);
     }
-    .cta-section .section-title { max-width: 500px; margin: 0 auto 16px; }
+    .cta-section .section-label { color: var(--emerald); }
+    .cta-section .section-title { max-width: 500px; margin: 0 auto 16px; color: var(--surface-dark-foreground); }
 
-    /* Footer */
+    /* Footer — dark */
     footer {
       padding: 40px 0;
-      border-top: 1px solid var(--border);
+      background: var(--surface-dark);
+      border-top: 1px solid var(--surface-dark-border);
       text-align: center;
-      color: var(--text-dim);
+      color: var(--surface-dark-muted);
       font-size: 0.8125rem;
     }
-    footer a { color: var(--text-muted); }
+    footer a { color: rgba(229, 231, 234, 0.6); }
+    footer a:hover { color: var(--surface-dark-foreground); }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -480,7 +507,7 @@
   </section>
 
   <!-- Tools -->
-  <section id="tools">
+  <section id="tools" class="tools-section">
     <div class="container">
       <div class="section-label">The Toolkit</div>
       <h2 class="section-title">Three Tools, One Mission</h2>
@@ -637,17 +664,17 @@
   </section>
 
   <!-- AEO in Practice -->
-  <section style="padding:80px 0; background:var(--bg);">
+  <section class="practice-section">
     <div class="container" style="max-width:720px;">
       <div class="section-label">AEO in Practice</div>
       <h2 class="section-title" style="text-align:left;">Wait, why isn't this page on boxfordpartners.com?</h2>
-      <div style="color:var(--text-muted); font-size:1.0625rem; line-height:1.75;">
+      <div style="color:var(--muted-foreground); font-size:1.0625rem; line-height:1.75;">
         <p style="margin-bottom:20px;">I know what you're asking yourself. Why don't you just put this page directly on your boxfordpartners.com website? Well, it's a funny story. And it's actually a live demonstration of what this toolkit measures.</p>
-        <p style="margin-bottom:20px;"><strong style="color:var(--text);">We did.</strong> The main AEO Toolkit page lives at <a href="https://www.boxfordpartners.com/tools/aeo" style="color:var(--accent);">boxfordpartners.com/tools/aeo</a>. This page exists here on GitHub Pages as a companion. And the reason comes down to one of the most important (and least understood) decisions in AEO: <strong style="color:var(--text);">subdirectory vs. subdomain.</strong></p>
-        <p style="margin-bottom:20px;">Here's the thing most people don't know: search engines and AI crawlers treat subdomains as separate websites. If we hosted this at <code style="background:var(--card-bg); padding:2px 6px; border-radius:4px; font-size:0.9em;">aeo.boxfordpartners.com</code>, every backlink pointing here would build authority for that subdomain instead of the main domain. All the link equity from this GitHub repo, the README, the hackathon references, the cross-links from other sites — it would all flow into a separate bucket that doesn't help boxfordpartners.com rank for anything.</p>
-        <p style="margin-bottom:20px;">But when the primary page lives at <code style="background:var(--card-bg); padding:2px 6px; border-radius:4px; font-size:0.9em;">boxfordpartners.com/tools/aeo</code> — a subdirectory — every inbound link strengthens the entire domain. The FAQ schema markup on that page, the SoftwareApplication structured data, the backlinks from GitHub — all of it consolidates under one domain authority. The AEO page benefits from the trust the main site has already built, and the main site benefits from the new topical authority the AEO page creates.</p>
-        <p style="margin-bottom:20px;">So why does this page exist at all? <strong style="color:var(--text);">Bidirectional link equity.</strong> This GitHub Pages site links to boxfordpartners.com, and boxfordpartners.com links back here. Two different domains referencing each other with relevant, contextual links — that's exactly the kind of signal both search engines and AI crawlers use to determine authority on a topic.</p>
-        <p style="margin-bottom:0;"><strong style="color:var(--text);">This is what AEO looks like in practice.</strong> Not tricks. Not gaming. Just understanding how the systems work and structuring your content so the right information reaches the right places. That's what the toolkit measures, and it's what we do for every client at Boxford Partners.</p>
+        <p style="margin-bottom:20px;"><strong style="color:var(--foreground);">We did.</strong> The main AEO Toolkit page lives at <a href="https://www.boxfordpartners.com/tools/aeo">boxfordpartners.com/tools/aeo</a>. This page exists here on GitHub Pages as a companion. And the reason comes down to one of the most important (and least understood) decisions in AEO: <strong style="color:var(--foreground);">subdirectory vs. subdomain.</strong></p>
+        <p style="margin-bottom:20px;">Here's the thing most people don't know: search engines and AI crawlers treat subdomains as separate websites. If we hosted this at <code style="background:var(--background); padding:2px 6px; border-radius:4px; font-size:0.9em;">aeo.boxfordpartners.com</code>, every backlink pointing here would build authority for that subdomain instead of the main domain. All the link equity from this GitHub repo, the README, the hackathon references, the cross-links from other sites — it would all flow into a separate bucket that doesn't help boxfordpartners.com rank for anything.</p>
+        <p style="margin-bottom:20px;">But when the primary page lives at <code style="background:var(--background); padding:2px 6px; border-radius:4px; font-size:0.9em;">boxfordpartners.com/tools/aeo</code> — a subdirectory — every inbound link strengthens the entire domain. The FAQ schema markup on that page, the SoftwareApplication structured data, the backlinks from GitHub — all of it consolidates under one domain authority. The AEO page benefits from the trust the main site has already built, and the main site benefits from the new topical authority the AEO page creates.</p>
+        <p style="margin-bottom:20px;">So why does this page exist at all? <strong style="color:var(--foreground);">Bidirectional link equity.</strong> This GitHub Pages site links to boxfordpartners.com, and boxfordpartners.com links back here. Two different domains referencing each other with relevant, contextual links — that's exactly the kind of signal both search engines and AI crawlers use to determine authority on a topic.</p>
+        <p style="margin-bottom:0;"><strong style="color:var(--foreground);">This is what AEO looks like in practice.</strong> Not tricks. Not gaming. Just understanding how the systems work and structuring your content so the right information reaches the right places. That's what the toolkit measures, and it's what we do for every client at Boxford Partners.</p>
       </div>
     </div>
   </section>
@@ -657,7 +684,7 @@
     <div class="container" style="text-align:center;">
       <div class="section-label">Built by Boxford Partners</div>
       <h2 class="section-title">Find Out What AI Sees When It Looks at Your Site</h2>
-      <p style="color:var(--text-muted); max-width:520px; margin:0 auto 32px; font-size:1.0625rem;">Run a free audit in under a minute. No account required, no data stored, no strings attached.</p>
+      <p style="color:var(--surface-dark-muted); max-width:520px; margin:0 auto 32px; font-size:1.0625rem;">Run a free audit in under a minute. No account required, no data stored, no strings attached.</p>
       <div class="hero-buttons">
         <a href="#quickstart" class="btn btn-primary">Run Your Audit</a>
         <a href="https://www.boxfordpartners.com/tools/aeo" class="btn btn-secondary">Learn More at Boxford Partners</a>

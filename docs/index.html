@@ -177,8 +177,8 @@
       padding: 16px 0;
     }
     nav .container { display: flex; align-items: center; justify-content: space-between; }
-    nav .brand { font-weight: 700; font-size: 1rem; color: var(--surface-dark-foreground); }
-    nav .brand span { color: var(--emerald); }
+    nav .brand { display: flex; align-items: center; }
+    nav .brand svg { height: 24px; width: auto; }
     nav .links { display: flex; gap: 20px; font-size: 0.875rem; }
     nav .links a { color: var(--surface-dark-muted); }
     nav .links a:hover { color: var(--emerald); text-decoration: none; }
@@ -423,13 +423,16 @@
 
     /* Footer — dark */
     footer {
-      padding: 40px 0;
+      padding: 48px 0 40px;
       background: var(--surface-dark);
       border-top: 1px solid var(--surface-dark-border);
       text-align: center;
       color: var(--surface-dark-muted);
       font-size: 0.8125rem;
     }
+    footer .footer-logo { display: inline-block; opacity: 0.7; margin-bottom: 20px; }
+    footer .footer-logo:hover { opacity: 1; }
+    footer .footer-logo svg { height: 20px; width: auto; }
     footer a { color: rgba(229, 231, 234, 0.6); }
     footer a:hover { color: var(--surface-dark-foreground); }
 
@@ -447,7 +450,13 @@
 
   <nav>
     <div class="container">
-      <a href="https://www.boxfordpartners.com" class="brand">Boxford <span>Partners</span></a>
+      <a href="https://www.boxfordpartners.com" class="brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 60" fill="none">
+          <rect x="0" y="8" width="4" height="36" rx="2" fill="#1a9a6c"/>
+          <text x="16" y="40" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="34" font-weight="800" letter-spacing="-0.02em" fill="#f8fafc">BOXFORD</text>
+          <text x="178" y="40" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="34" font-weight="300" letter-spacing="0.08em" fill="#94a3b8">partners</text>
+        </svg>
+      </a>
       <div class="links">
         <a href="#what-is-aeo">What is AEO</a>
         <a href="#tools">Tools</a>
@@ -694,6 +703,13 @@
 
   <footer>
     <div class="container">
+      <a href="https://www.boxfordpartners.com" class="footer-logo">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 60" fill="none">
+          <rect x="0" y="8" width="4" height="36" rx="2" fill="#1a9a6c"/>
+          <text x="16" y="40" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="34" font-weight="800" letter-spacing="-0.02em" fill="#f8fafc">BOXFORD</text>
+          <text x="178" y="40" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="34" font-weight="300" letter-spacing="0.08em" fill="#94a3b8">partners</text>
+        </svg>
+      </a>
       <p style="margin-bottom:8px;">
         <a href="https://www.boxfordpartners.com">Boxford Partners</a> &middot;
         <a href="https://github.com/patrickboxfordpartners/rote-playoffs">GitHub</a> &middot;

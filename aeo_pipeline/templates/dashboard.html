@@ -787,14 +787,32 @@ function downloadReport() {
   var gb = DATA.combined_score >= 80 ? '#ecfdf5' : DATA.combined_score >= 60 ? '#eff6ff' : DATA.combined_score >= 40 ? '#fefce8' : '#fef2f2';
   html += '<span class="grade" style="color:' + gc + ';background:' + gb + '">' + gradeLabel(DATA.combined_score) + '</span>';
 
+  // What This Means section
+  var explainer = DATA.executive_summary || '';
+  if (!explainer) {
+    if (DATA.combined_score >= 80) explainer = 'Your site is well-positioned for AI assistant citations. Focus on the remaining recommendations to reach full coverage.';
+    else if (DATA.combined_score >= 60) explainer = 'AI assistants can find your site but may skip it in favor of better-optimized competitors. The recommendations below target the gaps that cost you the most visibility.';
+    else if (DATA.combined_score >= 40) explainer = 'Your site has significant gaps that make it hard for AI assistants to understand and cite. Start from the top of the action plan and work down.';
+    else explainer = 'AI assistants are unlikely to cite your site in its current state. Start with crawler access and structured data — these are prerequisites for everything else.';
+  }
+  html += '<div style="background:#f8fafc;border-radius:8px;padding:1rem 1.2rem;margin-bottom:1.5rem"><strong>What This Means</strong><p style="margin:.5rem 0 0;color:#64748b">' + esc(explainer) + '</p></div>';
+
   html += '<h2>Technical Visibility (' + DATA.visibility_total + '/100)</h2>';
+  html += '<p style="color:#64748b;font-size:.85rem;margin-bottom:.8rem">This measures how easily AI assistants like ChatGPT, Perplexity, and Google AI can find and understand your website. Higher scores mean you\'re more likely to be recommended when people ask AI for help.</p>';
   var dims = [['AI Crawler Access', DATA.visibility_scores.crawler, 25], ['Structured Data', DATA.visibility_scores.structured, 30],
     ['Content Citability', DATA.visibility_scores.citability, 25], ['Entity & Authority', DATA.visibility_scores.authority, 20]];
+  var dimWhys = {
+    'AI Crawler Access': 'Can AI bots visit your site? This checks robots.txt, llms.txt, and sitemap availability.',
+    'Structured Data': 'Does your site speak the language AI understands? Schema markup and JSON-LD help AI parse your business info.',
+    'Content Citability': 'Is your content structured so AI can quote it? Clear headings, paragraphs, and FAQ formatting help.',
+    'Entity & Authority': 'Does AI know who you are? Social links, author info, and about pages build your identity.'
+  };
   dims.forEach(function(d) {
     var pct = Math.round((d[1]/d[2])*100);
     var c = pct >= 80 ? '#059669' : pct >= 60 ? '#2563eb' : pct >= 40 ? '#ca8a04' : '#dc2626';
     html += '<div><strong>' + d[0] + '</strong> <span style="float:right;color:#64748b">' + d[1] + '/' + d[2] + '</span></div>';
     html += '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + c + '"></div></div>';
+    if (dimWhys[d[0]]) html += '<p style="color:#94a3b8;font-size:.78rem;margin:-.4rem 0 .6rem">' + dimWhys[d[0]] + '</p>';
   });
 
   html += '<h2>Visibility Checklist</h2>';
@@ -808,12 +826,21 @@ function downloadReport() {
 
   if (DATA.content_pct !== null) {
     html += '<h2>Content Quality (' + DATA.content_pct + '/100)</h2>';
+    html += '<p style="color:#64748b;font-size:.85rem;margin-bottom:.8rem">AI assistants prefer content that sounds like a real expert wrote it. These five signals measure how natural and citable your writing is. Higher is better.</p>';
     var cnames = {burstiness:'Burstiness',vocabulary:'Vocabulary',hedging:'Hedging',monotony:'Monotony',specificity:'Specificity'};
+    var cwhys = {
+      burstiness: 'Sentence length variation — real writers mix short and long sentences naturally.',
+      vocabulary: 'Avoids generic filler words like "leverage" and "comprehensive" that weaken credibility.',
+      hedging: 'Uses definitive statements instead of weak qualifiers like "it\'s possible that."',
+      monotony: 'Paragraph structure variety — not every paragraph looks the same.',
+      specificity: 'Includes concrete details: numbers, names, examples, and data points.'
+    };
     Object.keys(DATA.content_signal_scores).forEach(function(k) {
       var pct = Math.round((1-DATA.content_signal_scores[k])*100);
       var c = pct >= 80 ? '#059669' : pct >= 60 ? '#2563eb' : pct >= 40 ? '#ca8a04' : '#dc2626';
       html += '<div><strong>' + (cnames[k]||k) + '</strong> <span style="float:right;color:#64748b">' + pct + '%</span></div>';
       html += '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + c + '"></div></div>';
+      if (cwhys[k]) html += '<p style="color:#94a3b8;font-size:.78rem;margin:-.4rem 0 .6rem">' + cwhys[k] + '</p>';
     });
   }
 
@@ -864,8 +891,48 @@ function downloadReport() {
     }
   }
 
+  // AI-Generated Insights (if available from --agents mode)
+  var hasAiInsights = (DATA.content_suggestions && DATA.content_suggestions.length > 0) ||
+                      (DATA.priority_actions && DATA.priority_actions.length > 0) ||
+                      (DATA.rewritten_meta && DATA.rewritten_meta.length > 0);
+  if (hasAiInsights) {
+    html += '<h2>AI-Generated Insights</h2>';
+    html += '<p style="color:#64748b;font-size:.85rem;margin-bottom:.8rem">These recommendations were generated by analyzing your scan results. Each one explains what to do and why it matters for your business.</p>';
+    if (DATA.priority_actions && DATA.priority_actions.length > 0) {
+      html += '<h3 style="font-size:.95rem;margin-top:1rem">Priority Fixes</h3>';
+      DATA.priority_actions.forEach(function(a, i) {
+        var action = typeof a === 'string' ? a : (a.action || '');
+        var impact = a.impact || '';
+        var diff = a.difficulty || '';
+        var dc = diff.toLowerCase().indexOf('easy') !== -1 ? '#059669' : diff.toLowerCase().indexOf('hard') !== -1 ? '#dc2626' : '#ca8a04';
+        html += '<div style="padding:.5rem 0;border-bottom:1px solid #f1f5f9"><strong>' + (i+1) + '.</strong> ' + esc(action);
+        if (impact) html += '<br><span style="color:#64748b;font-size:.82rem">' + esc(impact) + '</span>';
+        if (diff) html += ' <span style="color:' + dc + ';font-size:.78rem;font-weight:600">' + esc(diff) + '</span>';
+        html += '</div>';
+      });
+    }
+    if (DATA.content_suggestions && DATA.content_suggestions.length > 0) {
+      html += '<h3 style="font-size:.95rem;margin-top:1rem">Content Improvements</h3>';
+      DATA.content_suggestions.forEach(function(s) {
+        var text = typeof s === 'string' ? s : (s.suggestion || s.text || JSON.stringify(s));
+        html += '<div style="padding:.4rem 0;color:#334155;font-size:.9rem">&bull; ' + esc(text) + '</div>';
+      });
+    }
+    if (DATA.rewritten_meta && DATA.rewritten_meta.length > 0) {
+      html += '<h3 style="font-size:.95rem;margin-top:1rem">Suggested Meta Descriptions</h3>';
+      DATA.rewritten_meta.forEach(function(m) {
+        html += '<div style="padding:.5rem 0;border-bottom:1px solid #f1f5f9"><strong>' + esc(m.url || '') + '</strong>';
+        if (m.current) html += '<br><span style="text-decoration:line-through;color:#94a3b8;font-size:.85rem">' + esc(m.current) + '</span>';
+        if (m.suggested) html += '<br><span style="color:#059669;font-size:.85rem">' + esc(m.suggested) + '</span>';
+        html += '</div>';
+      });
+    }
+  }
+
   if (DATA.action_plan.length > 0) {
-    html += '<h2>Priority Action Plan</h2><ol>';
+    html += '<h2>Priority Action Plan</h2>';
+    html += '<p style="color:#64748b;font-size:.85rem;margin-bottom:.8rem">Ranked by impact — start from the top. Each fix makes the ones below it more effective.</p>';
+    html += '<ol>';
     DATA.action_plan.forEach(function(a) {
       html += '<li><strong>[' + esc(a.category) + ']</strong> ' + esc(a.action) + ' <em style="color:#94a3b8">(' + esc(a.impact) + ')</em></li>';
     });

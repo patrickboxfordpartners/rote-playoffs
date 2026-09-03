@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Readiness Report</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=DM+Serif+Display&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --ink: #1a1a2e;
+    --text: #334155;
+    --muted: #64748b;
+    --light: #94a3b8;
+    --hairline: #e2e8f0;
+    --surface: #f8fafc;
+    --white: #ffffff;
+    --accent: #b45309;
+    --accent-light: #fef3c7;
+    --green: #059669;
+    --green-light: #ecfdf5;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --yellow: #ca8a04;
+    --yellow-light: #fefce8;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+  }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--surface);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    height: 100vh;
+    padding: 12px;
+    background: #e9edf2;
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; padding: 0; gap: 0; }
+    .site-panel { display: none; }
+  }
+
+  .site-panel {
+    position: relative;
+    overflow: hidden;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .site-panel iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .site-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 36px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--hairline);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    z-index: 10;
+    gap: 8px;
+  }
+  .site-bar .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .site-bar .dot.r { background: #fca5a5; }
+  .site-bar .dot.y { background: #fde68a; }
+  .site-bar .dot.g { background: #86efac; }
+  .site-bar .url-text {
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--hairline);
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 0.7rem;
+    color: var(--muted);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .site-panel iframe { margin-top: 36px; height: calc(100% - 36px); }
+
+  .report-panel {
+    overflow-y: auto;
+    padding: 2rem 2.25rem;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .report-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .report-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.15rem;
+  }
+  .report-domain {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.4rem;
+    color: var(--ink);
+    margin-bottom: 0.75rem;
+  }
+  .score-hero {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.15rem;
+  }
+  .score-hero .num {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 3.5rem;
+    line-height: 1;
+    color: var(--ink);
+  }
+  .score-hero .of { font-size: 1rem; color: var(--light); }
+  .score-meter {
+    width: 200px; height: 5px;
+    background: var(--hairline); border-radius: 3px;
+    margin: 0.5rem auto; overflow: hidden;
+  }
+  .score-meter-fill { height: 100%; border-radius: 3px; transition: width 0.8s ease; }
+  .score-grade {
+    display: inline-block;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em;
+    padding: 0.2rem 0.7rem; border-radius: 999px; margin-top: 0.35rem;
+  }
+  .header-actions { display: none; }
+  .cta-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    font-size: 0.78rem; font-weight: 600;
+    padding: 0.55rem 1.2rem; border-radius: 8px;
+    border: 1px solid var(--hairline); background: var(--white);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: nowrap;
+  }
+  .btn:hover { background: var(--surface); border-color: var(--light); box-shadow: 0 4px 16px rgba(0,0,0,0.14); }
+  .btn-accent { background: var(--accent); color: var(--white); border-color: var(--accent); }
+  .btn-accent:hover { background: #92400e; }
+  .btn svg { width: 14px; height: 14px; }
+  @media (max-width: 900px) {
+    .cta-bar { position: static; transform: none; flex-direction: row; justify-content: center; padding: 0.75rem; }
+  }
+
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 10px;
+    padding: 1.4rem 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .section-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted);
+  }
+  .section-score {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.1rem; color: var(--ink);
+  }
+
+  .dim { margin-bottom: 0.85rem; }
+  .dim:last-child { margin-bottom: 0; }
+  .dim-top { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+  .dim-label { font-size: 0.8rem; color: var(--text); font-weight: 500; }
+  .dim-val { font-size: 0.75rem; color: var(--muted); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .dim-track { width: 100%; height: 5px; background: var(--hairline); border-radius: 3px; overflow: hidden; }
+  .dim-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem 1rem; }
+  .check-item { font-size: 0.75rem; display: flex; align-items: center; gap: 0.35rem; }
+  .check-icon { font-size: 0.85rem; flex-shrink: 0; }
+  .check-pass { color: var(--green); }
+  .check-fail { color: var(--red); }
+  .check-label { color: var(--text); }
+
+  .rec {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .rec:last-child { border-bottom: none; }
+  .rec-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.2rem; }
+  .rec-title { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+  .rec-pts { font-size: 0.7rem; font-weight: 700; color: var(--accent); white-space: nowrap; }
+  .rec-why { font-size: 0.75rem; color: var(--muted); line-height: 1.45; }
+  .rec-code {
+    margin-top: 0.35rem; padding: 0.5rem 0.65rem;
+    background: #1e293b; color: #e2e8f0;
+    font: 0.68rem/1.5 'SF Mono', 'Fira Code', Consolas, monospace;
+    border-radius: 5px; overflow-x: auto;
+    white-space: pre-wrap; word-break: break-all;
+  }
+
+  .action {
+    display: flex; gap: 0.6rem; padding: 0.5rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .action:last-child { border-bottom: none; }
+  .action-rank {
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.65rem; font-weight: 700; color: var(--white);
+    flex-shrink: 0; margin-top: 1px;
+  }
+  .action-body { flex: 1; }
+  .action-tag {
+    display: inline-block; font-size: 0.55rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.1rem 0.35rem; border-radius: 3px;
+    margin-right: 0.2rem; vertical-align: middle;
+  }
+  .action-tag.tech { background: var(--blue-light); color: var(--blue); }
+  .action-tag.content { background: var(--accent-light); color: var(--accent); }
+  .action-text { font-size: 0.78rem; color: var(--text); line-height: 1.4; }
+  .action-impact { font-size: 0.7rem; color: var(--light); margin-top: 0.05rem; }
+
+  .insight-item { padding: 0.6rem 0; border-bottom: 1px solid var(--hairline); }
+  .insight-item:last-child { border-bottom: none; }
+  .insight-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.15rem; }
+  .insight-text { font-size: 0.8rem; color: var(--text); line-height: 1.5; }
+  .insight-diff { font-size: 0.75rem; color: var(--muted); margin-top: 0.15rem; }
+  .insight-meta { display: flex; gap: 0.5rem; margin-top: 0.3rem; }
+  .insight-meta-tag { font-size: 0.6rem; font-weight: 600; padding: 0.1rem 0.4rem; border-radius: 3px; }
+  .insight-meta-tag.easy { background: var(--green-light); color: var(--green); }
+  .insight-meta-tag.medium { background: var(--yellow-light); color: var(--yellow); }
+  .insight-meta-tag.hard { background: var(--red-light); color: var(--red); }
+
+  .flag {
+    padding: 0.45rem 0; border-bottom: 1px solid var(--hairline);
+    cursor: pointer; transition: background 0.15s;
+    margin: 0 -0.5rem; padding-left: 0.5rem; padding-right: 0.5rem;
+    border-radius: 4px;
+  }
+  .flag:hover { background: var(--surface); }
+  .flag:last-child { border-bottom: none; }
+  .flag-signal {
+    display: inline-block; font-size: 0.55rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.1rem 0.35rem; border-radius: 3px;
+    margin-right: 0.3rem; vertical-align: middle;
+  }
+  .flag-signal.burstiness, .flag-signal.monotony { background: #fff7ed; color: #c2410c; }
+  .flag-signal.vocabulary { background: var(--red-light); color: var(--red); }
+  .flag-signal.hedging { background: var(--yellow-light); color: #a16207; }
+  .flag-signal.specificity { background: var(--blue-light); color: var(--blue); }
+  .flag-snippet { font-size: 0.75rem; color: var(--muted); font-style: italic; }
+  .flag-annotation { font-size: 0.72rem; color: var(--light); margin-top: 0.1rem; padding-left: 0.5rem; border-left: 2px solid var(--hairline); }
+
+  .empty { text-align: center; color: var(--light); font-size: 0.82rem; padding: 0.75rem 0; }
+
+  .footer {
+    text-align: center; color: var(--light); font-size: 0.7rem;
+    margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--hairline);
+  }
+  .footer a { color: var(--accent); text-decoration: none; }
+
+  .flags-toggle {
+    background: none; border: 1px solid var(--hairline); border-radius: 5px;
+    padding: 0.25rem 0.6rem; font-size: 0.72rem; font-weight: 500;
+    color: var(--muted); cursor: pointer; margin-top: 0.4rem;
+  }
+  .flags-toggle:hover { background: var(--surface); }
+
+  .score-explainer {
+    font-size: 0.75rem; color: var(--muted); line-height: 1.5;
+    margin-top: 0.5rem;
+  }
+
+  .section-why {
+    font-size: 0.75rem; color: var(--light); line-height: 1.55;
+    margin-bottom: 1rem; font-style: italic;
+  }
+
+  .agent-header {
+    display: flex; align-items: baseline; gap: 0.5rem;
+    margin-bottom: 0.2rem;
+  }
+  .agent-score-big {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.8rem; color: var(--ink); line-height: 1;
+  }
+  .agent-grade-tag {
+    font-size: 0.7rem; font-weight: 700; padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+  }
+  .agent-summary {
+    font-size: 0.75rem; color: var(--muted); line-height: 1.45;
+    margin: 0.5rem 0;
+  }
+  .agent-layer {
+    padding: 0.45rem 0; border-bottom: 1px solid var(--hairline);
+  }
+  .agent-layer:last-child { border-bottom: none; }
+  .agent-layer-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 0.2rem;
+  }
+  .agent-layer-name { font-size: 0.78rem; font-weight: 600; color: var(--text); }
+  .agent-layer-score { font-size: 0.72rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  .cf-badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.6rem;
+    border-radius: 5px; margin-top: 0.35rem;
+  }
+  .cf-badge.level-1 { background: var(--red-light); color: var(--red); }
+  .cf-badge.level-2 { background: var(--yellow-light); color: var(--yellow); }
+  .cf-badge.level-3 { background: var(--blue-light); color: var(--blue); }
+  .cf-badge.level-4, .cf-badge.level-5 { background: var(--green-light); color: var(--green); }
+
+  .cf-checks { margin-top: 0.5rem; }
+  .cf-cat { margin-bottom: 0.5rem; }
+  .cf-cat-name {
+    font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--light); margin-bottom: 0.2rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <div class="site-panel">
+    <div class="site-bar">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="url-text" id="url-bar"></span>
+    </div>
+    <iframe id="site-frame"></iframe>
+  </div>
+
+  <div class="cta-bar">
+    <button class="btn btn-accent" onclick="downloadReport()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download Report
+    </button>
+    <button class="btn" onclick="downloadJSON()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      JSON
+    </button>
+  </div>
+
+  <div class="report-panel">
+    <div class="report-header">
+      <div class="report-label">AI Readiness Report</div>
+      <div class="report-domain" id="domain"></div>
+      <div class="score-hero">
+        <span class="num" id="score-num">--</span>
+        <span class="of">/ 100</span>
+      </div>
+      <div class="score-meter"><div class="score-meter-fill" id="score-meter"></div></div>
+      <div class="score-grade" id="grade"></div>
+      <div class="header-actions">
+        <button class="btn btn-accent" onclick="downloadReport()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Report
+        </button>
+        <button class="btn" onclick="downloadJSON()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          JSON
+        </button>
+      </div>
+    </div>
+
+    <!-- Score explanation -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">What This Means</div>
+      </div>
+      <div class="score-explainer" id="score-explainer"></div>
+      <div class="score-explainer" id="delta-narrative" style="display:none;margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid var(--hairline)"></div>
+    </div>
+
+    <!-- Technical Visibility -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Technical Visibility</div>
+        <div class="section-score" id="vis-score"></div>
+      </div>
+      <div class="section-why">Can AI assistants like ChatGPT, Claude, and Perplexity find and understand your site? This measures the technical signals they look for.</div>
+      <div id="vis-dims"></div>
+    </div>
+
+    <!-- Signal Checklist -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Visibility Checklist</div>
+      </div>
+      <div class="section-why">Each item is something AI systems check when deciding whether to cite your site. Green means you're covered; red means you're invisible on that signal.</div>
+      <div class="check-grid" id="signal-checks"></div>
+    </div>
+
+    <!-- Content Quality -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Content Quality</div>
+        <div class="section-score" id="content-score"></div>
+      </div>
+      <div class="section-why">AI assistants prefer to cite content that reads naturally and provides concrete details. This measures how "citable" your writing is across five key signals.</div>
+      <div id="content-dims"></div>
+    </div>
+
+    <!-- Agent Readiness -->
+    <div class="section" id="agent-section" style="display:none">
+      <div class="section-head">
+        <div class="section-title">Agent Readiness</div>
+        <div class="section-score" id="agent-score-display"></div>
+      </div>
+      <div class="section-why">AI agents don't just read your site — they try to take actions on behalf of users (book appointments, compare prices, fill forms). This score measures whether your site is ready for that next wave.</div>
+      <div id="agent-content"></div>
+    </div>
+
+    <!-- Recommendations (detailed) -->
+    <div class="section" id="recs-section" style="display:none">
+      <div class="section-head">
+        <div class="section-title">Detailed Recommendations</div>
+      </div>
+      <div class="section-why">Each recommendation includes why it matters and, where possible, the exact code to add. Start from the top — they're ordered by impact.</div>
+      <div id="recs"></div>
+    </div>
+
+    <!-- AI-generated content suggestions -->
+    <div class="section" id="ai-insights-section" style="display:none">
+      <div class="section-head">
+        <div class="section-title">AI-Generated Insights</div>
+      </div>
+      <div class="section-why">These suggestions were generated by analyzing your site content with AI. They're specific, actionable improvements you can make today.</div>
+      <div id="ai-insights"></div>
+    </div>
+
+    <!-- What to Fix First -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Priority Action Plan</div>
+      </div>
+      <div id="actions"></div>
+    </div>
+
+    <!-- Content Issues -->
+    <div class="section" id="flags-section" style="display:none">
+      <div class="section-head">
+        <div class="section-title">Content Issues</div>
+        <div class="section-score" id="flag-count"></div>
+      </div>
+      <div id="flags"></div>
+    </div>
+
+    <div class="footer">
+      <a href="https://github.com/patrickmitchell/rote-playoffs">AEO Toolkit</a> &mdash; open source, zero API keys
+    </div>
+  </div>
+
+</div>
+
+<script>
+var DATA = __REPORT_DATA__;
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function scoreColor(s) { return s >= 80 ? 'var(--green)' : s >= 60 ? 'var(--blue)' : s >= 40 ? 'var(--yellow)' : 'var(--red)'; }
+function scoreBg(s) { return s >= 80 ? 'var(--green-light)' : s >= 60 ? 'var(--blue-light)' : s >= 40 ? 'var(--yellow-light)' : 'var(--red-light)'; }
+function gradeLabel(s) { return s >= 80 ? 'Excellent' : s >= 60 ? 'Good' : s >= 40 ? 'Needs Work' : s >= 20 ? 'Poor' : 'Critical'; }
+
+function dimBar(container, label, score, max) {
+  var pct = max > 0 ? Math.round((score / max) * 100) : 0;
+  var d = document.createElement('div'); d.className = 'dim';
+  d.innerHTML = '<div class="dim-top"><span class="dim-label">' + esc(label) + '</span><span class="dim-val">' + score + ' / ' + max + '</span></div>' +
+    '<div class="dim-track"><div class="dim-fill" style="width:' + pct + '%;background:' + scoreColor(pct) + '"></div></div>';
+  container.appendChild(d);
+}
+
+function signalBar(container, label, rawScore) {
+  var pct = Math.round((1 - rawScore) * 100);
+  var d = document.createElement('div'); d.className = 'dim';
+  d.innerHTML = '<div class="dim-top"><span class="dim-label">' + esc(label) + '</span><span class="dim-val">' + pct + '%</span></div>' +
+    '<div class="dim-track"><div class="dim-fill" style="width:' + pct + '%;background:' + scoreColor(pct) + '"></div></div>';
+  container.appendChild(d);
+}
+
+// Site iframe
+document.getElementById('url-bar').textContent = DATA.url || DATA.domain;
+var frame = document.getElementById('site-frame');
+frame.src = DATA.url;
+frame.onerror = function() { frame.src = '/site'; };
+setTimeout(function() {
+  try {
+    var doc = frame.contentDocument || frame.contentWindow.document;
+    if (!doc || !doc.body || doc.body.innerHTML.length < 50) { frame.src = '/site'; }
+  } catch(e) {}
+}, 3000);
+
+// Header
+document.getElementById('domain').textContent = DATA.domain;
+document.getElementById('score-num').textContent = DATA.combined_score;
+var color = scoreColor(DATA.combined_score);
+document.getElementById('score-meter').style.cssText = 'width:' + DATA.combined_score + '%;background:' + color;
+var g = document.getElementById('grade');
+g.textContent = gradeLabel(DATA.combined_score);
+g.style.color = color; g.style.background = scoreBg(DATA.combined_score);
+
+// Score explainer
+var sc = DATA.combined_score;
+// Use LLM-generated summary when available, fall back to template text
+var explainerText = '';
+if (DATA.executive_summary) {
+  explainerText = DATA.executive_summary;
+} else if (sc >= 80) {
+  explainerText = 'Your site is well-positioned for AI assistant citations. AI crawlers can access your content, your structured data is solid, and your content reads naturally. Focus on the remaining recommendations to reach full coverage.';
+} else if (sc >= 60) {
+  explainerText = 'AI assistants can find your site but may skip it in favor of better-optimized competitors. The recommendations below target the gaps that cost you the most visibility. Most are quick wins — schema markup, meta descriptions, and heading structure.';
+} else if (sc >= 40) {
+  explainerText = 'Your site has significant gaps that make it hard for AI assistants to understand and cite. The priority action plan below is ordered by impact — start from the top and work down. Each fix makes the next one more effective.';
+} else {
+  explainerText = 'AI assistants are unlikely to cite your site in its current state. The good news: the most impactful fixes are often the simplest. Start with crawler access and structured data — these are prerequisites for everything else.';
+}
+document.getElementById('score-explainer').textContent = explainerText;
+
+if (DATA.delta_narrative) {
+  var dn = document.getElementById('delta-narrative');
+  dn.style.display = '';
+  dn.innerHTML = '<strong style="font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent)">Changes Since Last Scan</strong><br>' + esc(DATA.delta_narrative);
+}
+
+// Visibility
+document.getElementById('vis-score').textContent = DATA.visibility_total + ' / 100';
+var vc = document.getElementById('vis-dims');
+dimBar(vc, 'AI Crawler Access', DATA.visibility_scores.crawler, 25);
+dimBar(vc, 'Structured Data', DATA.visibility_scores.structured, 30);
+dimBar(vc, 'Content Citability', DATA.visibility_scores.citability, 25);
+dimBar(vc, 'Entity & Authority', DATA.visibility_scores.authority, 20);
+
+// Signal checklist
+var signalLabels = {
+  robots_exists: 'robots.txt', GPTBot_allowed: 'GPTBot allowed', ClaudeBot_allowed: 'ClaudeBot allowed',
+  PerplexityBot_allowed: 'Perplexity allowed', GoogleOther_allowed: 'GoogleOther allowed',
+  llms_txt: 'llms.txt', sitemap_found: 'XML Sitemap', json_ld: 'JSON-LD schema',
+  graph_wrapping: '@graph wrapper', org_schema: 'Organization schema', faq_schema: 'FAQ schema',
+  howto_schema: 'HowTo schema', og_tags: 'Open Graph tags', heading_hierarchy: 'Heading hierarchy',
+  meta_description: 'Meta description', short_paragraphs: 'Short paragraphs', faq_section: 'FAQ section',
+  about_contact_pages: 'About/Contact pages', sameAs_links: 'sameAs social links',
+  author_schema: 'Author schema', brand_consistency: 'Brand consistency'
+};
+var sc_container = document.getElementById('signal-checks');
+if (DATA.signals) {
+  Object.keys(signalLabels).forEach(function(k) {
+    if (DATA.signals[k] === undefined) return;
+    var pass = !!DATA.signals[k];
+    var el = document.createElement('div'); el.className = 'check-item';
+    el.innerHTML = '<span class="check-icon ' + (pass ? 'check-pass' : 'check-fail') + '">' +
+      (pass ? '&#10003;' : '&#10007;') + '</span><span class="check-label">' + esc(signalLabels[k]) + '</span>';
+    sc_container.appendChild(el);
+  });
+}
+
+// Content
+if (DATA.content_pct !== null) {
+  document.getElementById('content-score').textContent = DATA.content_pct + ' / 100';
+  var cc = document.getElementById('content-dims');
+  var names = { burstiness:'Burstiness', vocabulary:'Vocabulary', hedging:'Hedging', monotony:'Monotony', specificity:'Specificity' };
+  Object.keys(DATA.content_signal_scores).forEach(function(k) { signalBar(cc, names[k] || k, DATA.content_signal_scores[k]); });
+
+  if (DATA.content_flags && DATA.content_flags.length > 0) {
+    document.getElementById('flags-section').style.display = '';
+    document.getElementById('flag-count').textContent = DATA.content_flags.length + ' issues';
+    var fc = document.getElementById('flags');
+    var shown = {}, count = 0;
+    DATA.content_flags.forEach(function(f) {
+      var key = f.signal + ':' + f.start;
+      if (shown[key]) return;
+      shown[key] = true; count++;
+      var el = document.createElement('div');
+      el.className = 'flag';
+      if (count > 5) el.style.display = 'none';
+      el.setAttribute('data-flag', 'true');
+      el.setAttribute('data-snippet', DATA.text.substring(f.start, Math.min(f.end, f.start + 60)));
+      var snip = DATA.text.substring(f.start, f.end);
+      if (snip.length > 80) snip = snip.substring(0, 80) + '…';
+      el.innerHTML = '<div><span class="flag-signal ' + esc(f.signal) + '">' + esc(f.signal) + '</span>' +
+        '<span class="flag-snippet">"' + esc(snip) + '"</span></div>' +
+        '<div class="flag-annotation">' + esc(f.annotation) + '</div>';
+      el.addEventListener('click', function() { highlightInSite(el.getAttribute('data-snippet')); });
+      fc.appendChild(el);
+    });
+    if (count > 5) {
+      var btn = document.createElement('button'); btn.className = 'flags-toggle';
+      btn.textContent = 'Show all ' + count + ' issues';
+      btn.onclick = function() { fc.querySelectorAll('[data-flag]').forEach(function(el) { el.style.display = ''; }); btn.remove(); };
+      fc.appendChild(btn);
+    }
+  }
+} else {
+  document.getElementById('content-score').textContent = '—';
+  document.getElementById('content-dims').innerHTML = '<div class="empty">Not enough text to analyze</div>';
+}
+
+// Agent Readiness
+if (DATA.agent_readiness && (DATA.agent_readiness.ora || DATA.agent_readiness.cloudflare)) {
+  document.getElementById('agent-section').style.display = '';
+  var agc = document.getElementById('agent-content');
+  var ar = DATA.agent_readiness;
+
+  if (ar.ora) {
+    var ora = ar.ora;
+    var oraColor = scoreColor(ora.score);
+    var oraBg = scoreBg(ora.score);
+    document.getElementById('agent-score-display').textContent = ora.score + ' / ' + ora.maxScore;
+
+    var html = '<div class="agent-header"><span class="agent-score-big">' + ora.score + '</span>';
+    html += '<span class="agent-grade-tag" style="color:' + oraColor + ';background:' + oraBg + '">' + esc(ora.grade) + '</span></div>';
+    if (ora.summary) html += '<div class="agent-summary">' + esc(ora.summary) + '</div>';
+
+    if (ora.layers && ora.layers.length) {
+      ora.layers.forEach(function(l) {
+        var lpct = l.maxScore > 0 ? Math.round((l.score / l.maxScore) * 100) : 0;
+        html += '<div class="agent-layer"><div class="agent-layer-head"><span class="agent-layer-name">' + esc(l.name) + '</span>';
+        html += '<span class="agent-layer-score">' + l.score + '/' + l.maxScore + '</span></div>';
+        html += '<div class="dim-track"><div class="dim-fill" style="width:' + lpct + '%;background:' + scoreColor(lpct) + '"></div></div></div>';
+      });
+    }
+
+    html += '<div style="font-size:0.65rem;color:var(--light);margin-top:0.5rem">Powered by <a href="https://ora.ai/score/' + esc(ar.ora.source ? DATA.domain : '') + '" target="_blank" style="color:var(--accent)">ora.ai</a></div>';
+    agc.innerHTML = html;
+  }
+
+  if (ar.cloudflare) {
+    var cf = ar.cloudflare;
+    var levelClass = 'level-' + Math.min(cf.level, 5);
+    var cfHtml = '<div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--hairline)">';
+    cfHtml += '<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem">Cloudflare Agent Check</div>';
+    cfHtml += '<div class="cf-badge ' + levelClass + '">Level ' + cf.level + ' — ' + esc(cf.levelName) + '</div>';
+
+    if (cf.categories) {
+      cfHtml += '<div class="cf-checks">';
+      Object.keys(cf.categories).forEach(function(cat) {
+        cfHtml += '<div class="cf-cat"><div class="cf-cat-name">' + esc(cat.replace(/([A-Z])/g, ' $1').trim()) + '</div>';
+        cf.categories[cat].forEach(function(c) {
+          var icon = c.status === 'pass' ? '<span class="check-icon check-pass">&#10003;</span>' : '<span class="check-icon check-fail">&#10007;</span>';
+          cfHtml += '<div class="check-item">' + icon + '<span class="check-label">' + esc(c.message || c.name) + '</span></div>';
+        });
+        cfHtml += '</div>';
+      });
+      cfHtml += '</div>';
+    }
+
+    cfHtml += '<div style="font-size:0.65rem;color:var(--light);margin-top:0.5rem">Powered by <a href="https://isitagentready.com" target="_blank" style="color:var(--accent)">isitagentready.com</a> (Cloudflare)</div>';
+    cfHtml += '</div>';
+    agc.innerHTML += cfHtml;
+  }
+}
+
+// Detailed Recommendations
+if (DATA.recommendations && DATA.recommendations.length > 0) {
+  document.getElementById('recs-section').style.display = '';
+  var rc = document.getElementById('recs');
+  DATA.recommendations.forEach(function(r) {
+    var el = document.createElement('div'); el.className = 'rec';
+    var html = '<div class="rec-head"><span class="rec-title">' + esc(r.title) + '</span><span class="rec-pts">+' + r.points + 'pts</span></div>';
+    if (r.why) html += '<div class="rec-why">' + esc(r.why) + '</div>';
+    if (r.code) html += '<div class="rec-code">' + esc(r.code) + '</div>';
+    el.innerHTML = html;
+    rc.appendChild(el);
+  });
+}
+
+// AI-Generated Insights (content suggestions + rewritten meta)
+var hasInsights = (DATA.content_suggestions && DATA.content_suggestions.length > 0) ||
+                  (DATA.rewritten_meta && DATA.rewritten_meta.length > 0) ||
+                  (DATA.priority_actions && DATA.priority_actions.length > 0);
+if (hasInsights) {
+  document.getElementById('ai-insights-section').style.display = '';
+  var aic = document.getElementById('ai-insights');
+  var aiHtml = '';
+
+  if (DATA.content_suggestions && DATA.content_suggestions.length > 0) {
+    DATA.content_suggestions.forEach(function(s) {
+      var text = typeof s === 'string' ? s : (s.suggestion || s.text || JSON.stringify(s));
+      aiHtml += '<div class="insight-item"><div class="insight-label">Content</div>';
+      aiHtml += '<div class="insight-text">' + esc(text) + '</div></div>';
+    });
+  }
+
+  if (DATA.rewritten_meta && DATA.rewritten_meta.length > 0) {
+    DATA.rewritten_meta.forEach(function(m) {
+      aiHtml += '<div class="insight-item"><div class="insight-label">Meta Description</div>';
+      aiHtml += '<div class="insight-text">' + esc(m.url || '') + '</div>';
+      if (m.current) aiHtml += '<div class="insight-diff" style="text-decoration:line-through">' + esc(m.current) + '</div>';
+      if (m.suggested) aiHtml += '<div class="insight-diff" style="color:var(--green)">' + esc(m.suggested) + '</div>';
+      aiHtml += '</div>';
+    });
+  }
+
+  if (DATA.priority_actions && DATA.priority_actions.length > 0) {
+    DATA.priority_actions.forEach(function(a) {
+      var action = typeof a === 'string' ? a : (a.action || a.text || JSON.stringify(a));
+      var impact = a.impact || '';
+      var diff = a.difficulty || '';
+      aiHtml += '<div class="insight-item"><div class="insight-label">Priority Fix</div>';
+      aiHtml += '<div class="insight-text">' + esc(action) + '</div>';
+      if (impact || diff) {
+        aiHtml += '<div class="insight-meta">';
+        if (impact) aiHtml += '<span class="insight-meta-tag medium">' + esc(impact) + '</span>';
+        if (diff) {
+          var dc = diff.toLowerCase().indexOf('easy') !== -1 ? 'easy' : diff.toLowerCase().indexOf('hard') !== -1 ? 'hard' : 'medium';
+          aiHtml += '<span class="insight-meta-tag ' + dc + '">' + esc(diff) + '</span>';
+        }
+        aiHtml += '</div>';
+      }
+      aiHtml += '</div>';
+    });
+  }
+
+  aic.innerHTML = aiHtml;
+}
+
+// Actions
+var ac = document.getElementById('actions');
+if (DATA.action_plan.length === 0) {
+  ac.innerHTML = '<div class="empty">No critical issues.</div>';
+} else {
+  DATA.action_plan.forEach(function(a, i) {
+    var tc = a.category === 'TECHNICAL' ? 'tech' : 'content';
+    var nb = a.category === 'TECHNICAL' ? 'var(--blue)' : 'var(--accent)';
+    var el = document.createElement('div'); el.className = 'action';
+    el.innerHTML = '<div class="action-rank" style="background:' + nb + '">' + (i+1) + '</div>' +
+      '<div class="action-body"><div><span class="action-tag ' + tc + '">' + esc(a.category) + '</span>' +
+      '<span class="action-text">' + esc(a.action) + '</span></div>' +
+      '<div class="action-impact">' + esc(a.impact) + '</div></div>';
+    ac.appendChild(el);
+  });
+}
+
+function highlightInSite(snippet) {
+  try {
+    document.getElementById('site-frame').contentWindow.postMessage({ type: 'highlight', text: snippet }, '*');
+  } catch(e) {}
+}
+
+// Download HTML report
+function downloadReport() {
+  var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>AI Readiness Report - ' + esc(DATA.domain) + '</title>';
+  html += '<style>body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:720px;margin:2rem auto;padding:0 1.5rem;color:#334155;line-height:1.6}';
+  html += 'h1{color:#1a1a2e;border-bottom:2px solid #e2e8f0;padding-bottom:.5rem}h2{color:#1a1a2e;margin-top:1.5rem;font-size:1.1rem}';
+  html += '.score{font-size:3rem;font-weight:bold;color:#1a1a2e}.grade{display:inline-block;padding:.2rem .8rem;border-radius:999px;font-size:.85rem;font-weight:700}';
+  html += '.bar-track{height:8px;background:#e2e8f0;border-radius:4px;margin:.3rem 0 .8rem}.bar-fill{height:100%;border-radius:4px}';
+  html += '.check{margin:.15rem 0;font-size:.9rem}.pass{color:#059669}.fail{color:#dc2626}';
+  html += 'pre{background:#1e293b;color:#e2e8f0;padding:.8rem 1rem;border-radius:6px;overflow-x:auto;font-size:.8rem;line-height:1.5}';
+  html += '.rec{border-bottom:1px solid #e2e8f0;padding:.6rem 0}.pts{color:#b45309;font-weight:700;float:right}';
+  html += '.meta{color:#94a3b8;font-size:.8rem;margin-top:2rem;border-top:1px solid #e2e8f0;padding-top:.8rem}';
+  html += '</style></head><body>';
+  html += '<h1>AI Readiness Report</h1>';
+  html += '<p><strong>' + esc(DATA.domain) + '</strong> &mdash; scanned ' + new Date().toLocaleDateString() + '</p>';
+  html += '<div class="score">' + DATA.combined_score + '<span style="font-size:1rem;color:#94a3b8"> / 100</span></div>';
+  var gc = DATA.combined_score >= 80 ? '#059669' : DATA.combined_score >= 60 ? '#2563eb' : DATA.combined_score >= 40 ? '#ca8a04' : '#dc2626';
+  var gb = DATA.combined_score >= 80 ? '#ecfdf5' : DATA.combined_score >= 60 ? '#eff6ff' : DATA.combined_score >= 40 ? '#fefce8' : '#fef2f2';
+  html += '<span class="grade" style="color:' + gc + ';background:' + gb + '">' + gradeLabel(DATA.combined_score) + '</span>';
+
+  html += '<h2>Technical Visibility (' + DATA.visibility_total + '/100)</h2>';
+  var dims = [['AI Crawler Access', DATA.visibility_scores.crawler, 25], ['Structured Data', DATA.visibility_scores.structured, 30],
+    ['Content Citability', DATA.visibility_scores.citability, 25], ['Entity & Authority', DATA.visibility_scores.authority, 20]];
+  dims.forEach(function(d) {
+    var pct = Math.round((d[1]/d[2])*100);
+    var c = pct >= 80 ? '#059669' : pct >= 60 ? '#2563eb' : pct >= 40 ? '#ca8a04' : '#dc2626';
+    html += '<div><strong>' + d[0] + '</strong> <span style="float:right;color:#64748b">' + d[1] + '/' + d[2] + '</span></div>';
+    html += '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + c + '"></div></div>';
+  });
+
+  html += '<h2>Visibility Checklist</h2>';
+  if (DATA.signals) {
+    Object.keys(signalLabels).forEach(function(k) {
+      if (DATA.signals[k] === undefined) return;
+      var p = !!DATA.signals[k];
+      html += '<div class="check"><span class="' + (p?'pass':'fail') + '">' + (p?'&#10003;':'&#10007;') + '</span> ' + esc(signalLabels[k]) + '</div>';
+    });
+  }
+
+  if (DATA.content_pct !== null) {
+    html += '<h2>Content Quality (' + DATA.content_pct + '/100)</h2>';
+    var cnames = {burstiness:'Burstiness',vocabulary:'Vocabulary',hedging:'Hedging',monotony:'Monotony',specificity:'Specificity'};
+    Object.keys(DATA.content_signal_scores).forEach(function(k) {
+      var pct = Math.round((1-DATA.content_signal_scores[k])*100);
+      var c = pct >= 80 ? '#059669' : pct >= 60 ? '#2563eb' : pct >= 40 ? '#ca8a04' : '#dc2626';
+      html += '<div><strong>' + (cnames[k]||k) + '</strong> <span style="float:right;color:#64748b">' + pct + '%</span></div>';
+      html += '<div class="bar-track"><div class="bar-fill" style="width:' + pct + '%;background:' + c + '"></div></div>';
+    });
+  }
+
+  if (DATA.recommendations && DATA.recommendations.length > 0) {
+    html += '<h2>Recommendations</h2>';
+    DATA.recommendations.forEach(function(r) {
+      html += '<div class="rec"><strong>' + esc(r.title) + '</strong><span class="pts">+' + r.points + 'pts</span>';
+      if (r.why) html += '<br><span style="color:#64748b;font-size:.85rem">' + esc(r.why) + '</span>';
+      if (r.code) html += '<pre>' + esc(r.code) + '</pre>';
+      html += '</div>';
+    });
+  }
+
+  if (DATA.agent_readiness && (DATA.agent_readiness.ora || DATA.agent_readiness.cloudflare)) {
+    html += '<h2>Agent Readiness</h2>';
+    html += '<p style="color:#64748b;font-size:.85rem">AI agents don\'t just read your site &mdash; they try to take actions on behalf of users (book appointments, compare products, fill forms). This section measures how ready your site is for that next wave of AI interaction.</p>';
+    var ar = DATA.agent_readiness;
+    if (ar.ora) {
+      html += '<div style="margin:.8rem 0"><span style="font-size:2rem;font-weight:bold;color:#1a1a2e">' + ar.ora.score + '</span>';
+      html += '<span style="font-size:1rem;color:#94a3b8"> / ' + ar.ora.maxScore + '</span>';
+      var agc = ar.ora.score >= 80 ? '#059669' : ar.ora.score >= 60 ? '#2563eb' : ar.ora.score >= 40 ? '#ca8a04' : '#dc2626';
+      var agb = ar.ora.score >= 80 ? '#ecfdf5' : ar.ora.score >= 60 ? '#eff6ff' : ar.ora.score >= 40 ? '#fefce8' : '#fef2f2';
+      html += ' <span class="grade" style="color:' + agc + ';background:' + agb + '">' + esc(ar.ora.grade) + '</span></div>';
+      if (ar.ora.summary) html += '<p style="margin:.5rem 0;color:#64748b">' + esc(ar.ora.summary) + '</p>';
+      if (ar.ora.layers) {
+        ar.ora.layers.forEach(function(l) {
+          var lpct = l.maxScore > 0 ? Math.round((l.score/l.maxScore)*100) : 0;
+          var lc = lpct >= 80 ? '#059669' : lpct >= 60 ? '#2563eb' : lpct >= 40 ? '#ca8a04' : '#dc2626';
+          html += '<div><strong>' + esc(l.name) + '</strong> <span style="float:right;color:#64748b">' + l.score + '/' + l.maxScore + '</span></div>';
+          html += '<div class="bar-track"><div class="bar-fill" style="width:' + lpct + '%;background:' + lc + '"></div></div>';
+        });
+      }
+      html += '<p style="font-size:.75rem;color:#94a3b8">Powered by ora.ai</p>';
+    }
+    if (ar.cloudflare) {
+      html += '<div style="margin-top:1rem;padding-top:.8rem;border-top:1px solid #e2e8f0">';
+      html += '<strong>Cloudflare Agent Check:</strong> Level ' + ar.cloudflare.level + ' &mdash; ' + esc(ar.cloudflare.levelName);
+      if (ar.cloudflare.categories) {
+        Object.keys(ar.cloudflare.categories).forEach(function(cat) {
+          html += '<div style="margin-top:.5rem"><strong style="font-size:.85rem">' + esc(cat.replace(/([A-Z])/g, ' $1').trim()) + '</strong></div>';
+          ar.cloudflare.categories[cat].forEach(function(c) {
+            var icon = c.status === 'pass' ? '<span class="pass">&#10003;</span>' : '<span class="fail">&#10007;</span>';
+            html += '<div class="check">' + icon + ' ' + esc(c.message || c.name) + '</div>';
+          });
+        });
+      }
+      html += '<p style="font-size:.75rem;color:#94a3b8">Powered by isitagentready.com (Cloudflare)</p></div>';
+    }
+  }
+
+  if (DATA.action_plan.length > 0) {
+    html += '<h2>Priority Action Plan</h2><ol>';
+    DATA.action_plan.forEach(function(a) {
+      html += '<li><strong>[' + esc(a.category) + ']</strong> ' + esc(a.action) + ' <em style="color:#94a3b8">(' + esc(a.impact) + ')</em></li>';
+    });
+    html += '</ol>';
+  }
+
+  html += '<div class="meta">Generated by AEO Toolkit &mdash; open source, zero API keys<br>';
+  html += '<a href="https://github.com/patrickmitchell/rote-playoffs">github.com/patrickmitchell/rote-playoffs</a></div>';
+  html += '</body></html>';
+
+  var blob = new Blob([html], { type: 'text/html' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ai-readiness-report-' + DATA.domain.replace(/[^a-z0-9]/gi, '-') + '.html';
+  a.click();
+}
+
+function downloadJSON() {
+  var blob = new Blob([JSON.stringify(DATA, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ai-readiness-report-' + DATA.domain.replace(/[^a-z0-9]/gi, '-') + '.json';
+  a.click();
+}
+</script>
+</body>
+</html>

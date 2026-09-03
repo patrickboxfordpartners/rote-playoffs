@@ -100,9 +100,38 @@ def run_pipeline(url):
     recs = generate_recommendations(ext, fetched, all_signals, input_url=url)
 
     text = _extract_text(html_body)
+
+    # JS-heavy pages yield little text from raw HTML — try enhanced fetching
+    if len(text.split()) < 20:
+        try:
+            from .fetcher import fetch_rendered_html
+            rendered_html, _, method = fetch_rendered_html(url)
+            if method == "firecrawl" and rendered_html:
+                rendered_text = _extract_text(rendered_html)
+                if len(rendered_text.split()) > len(text.split()):
+                    text = rendered_text
+        except Exception:
+            pass
+        if len(text.split()) < 20:
+            try:
+                from .fetcher import extract_content
+                tavily_text, _, method = extract_content(url)
+                if method == "tavily" and len(tavily_text.split()) > len(text.split()):
+                    text = tavily_text
+            except Exception:
+                pass
+
     content_result = analyze(text) if len(text.split()) >= 20 else None
 
     content_pct = round((1 - content_result.overall_score) * 100) if content_result else None
+
+    # Agent readiness scan (ora.ai + Cloudflare)
+    agent_data = None
+    try:
+        from .agent_readiness import scan_agent_readiness
+        agent_data, agent_errors = scan_agent_readiness(url)
+    except Exception:
+        pass
 
     if content_pct is not None:
         combined = round(visibility_total * 0.5 + content_pct * 0.5)
@@ -118,6 +147,7 @@ def run_pipeline(url):
         "recommendations": recs,
         "content_pct": content_pct,
         "content_result": content_result,
+        "agent_readiness": agent_data,
     }, None
 
 
@@ -161,6 +191,22 @@ def format_report(data):
         lines.append(f"\n  CONTENT QUALITY")
         lines.append("  " + "─" * 44)
         lines.append("    Insufficient text for analysis (< 20 words)")
+
+    agent = data.get("agent_readiness")
+    if agent and (agent.get("ora") or agent.get("cloudflare")):
+        lines.append(f"\n  AGENT READINESS")
+        lines.append("  " + "─" * 44)
+        if agent.get("ora"):
+            ora = agent["ora"]
+            lines.append(f"    Score: {ora['score']}/{ora['maxScore']}  ({ora['grade']})")
+            if ora.get("summary"):
+                lines.append(f"    {ora['summary'][:80]}")
+            for layer in ora.get("layers", []):
+                bar = _bar(layer["score"], layer["maxScore"])
+                lines.append(f"    {layer['name']:<22} {bar}  {layer['score']}/{layer['maxScore']}")
+        if agent.get("cloudflare"):
+            cf = agent["cloudflare"]
+            lines.append(f"    Cloudflare: Level {cf['level']} — {cf['levelName']}")
 
     actions = _build_action_plan(data)
     if actions:
@@ -230,7 +276,66 @@ def format_json(data):
         for c, a, i in _build_action_plan(data)
     ]
 
+    out["agent_readiness"] = data.get("agent_readiness")
+
     return json.dumps(out, indent=2)
+
+
+def _bridge_agent_result(agent_result: dict, url: str) -> dict:
+    """Convert agent pipeline output into the shape the dashboard expects.
+
+    The agent pipeline returns an AnalysisComplete with crawl_data nested
+    inside. The dashboard expects the flat dict that run_pipeline() returns.
+    This bridges between the two, preserving LLM-generated fields as extras.
+    """
+    # raw_scores carries the full crawl_data dict from the reasoning agent
+    crawl = agent_result.get("raw_scores", {})
+    if not crawl:
+        crawl = agent_result.get("crawl_data", {})
+
+    visibility_scores = crawl.get("visibility_scores", {})
+    visibility_total = sum(visibility_scores.values())
+    content_results = crawl.get("content_results", [])
+
+    # Reconstruct content_result as a simple namespace for .risk_level etc.
+    content_result = None
+    content_pct = None
+    if content_results:
+        cr = content_results[0]
+        content_pct = cr.get("score_pct")
+
+        class ContentProxy:
+            pass
+        content_result = ContentProxy()
+        content_result.risk_level = cr.get("risk_level", "UNKNOWN")
+        content_result.signal_scores = cr.get("signal_scores", {})
+        content_result.overall_score = (1 - content_pct / 100) if content_pct else 0.5
+        content_result.flags = []
+        content_result.text = ""
+
+    if content_pct is not None:
+        combined = round(visibility_total * 0.5 + content_pct * 0.5)
+    else:
+        combined = visibility_total
+
+    data = {
+        "url": url,
+        "combined_score": combined,
+        "visibility_total": visibility_total,
+        "visibility_scores": visibility_scores,
+        "signals": crawl.get("signals", {}),
+        "recommendations": crawl.get("recommendations", []),
+        "content_pct": content_pct,
+        "content_result": content_result,
+        "agent_readiness": crawl.get("agent_readiness"),
+        # LLM-generated extras from the reasoning agent
+        "executive_summary": agent_result.get("executive_summary", ""),
+        "delta_narrative": agent_result.get("delta_narrative", ""),
+        "rewritten_meta": agent_result.get("rewritten_meta", []),
+        "content_suggestions": agent_result.get("content_suggestions", []),
+        "priority_actions": agent_result.get("priority_actions", []),
+    }
+    return data
 
 
 def main():
@@ -240,6 +345,8 @@ def main():
     )
     parser.add_argument("url", help="Public URL to audit")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
+    parser.add_argument("--no-browser", action="store_true", help="Print to terminal instead of opening dashboard")
+    parser.add_argument("--agents", action="store_true", help="Use multi-agent pipeline (Firecrawl + Mitosis + LLM)")
     args = parser.parse_args()
 
     url = args.url
@@ -251,17 +358,29 @@ def main():
         print(f"Error: invalid URL '{args.url}'", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Scanning {url} ...\n", file=sys.stderr)
-
-    data, error = run_pipeline(url)
-    if error:
-        print(f"Error: {error}", file=sys.stderr)
-        sys.exit(1)
+    if args.agents:
+        print(f"Scanning {url} (multi-agent mode) ...\n", file=sys.stderr)
+        from .agents.orchestrator import run_sync
+        agent_result = run_sync(url)
+        if agent_result.get("error"):
+            print(f"Error: {agent_result['error']}", file=sys.stderr)
+            sys.exit(1)
+        data = _bridge_agent_result(agent_result, url)
+    else:
+        print(f"Scanning {url} ...\n", file=sys.stderr)
+        data, error = run_pipeline(url)
+        if error:
+            print(f"Error: {error}", file=sys.stderr)
+            sys.exit(1)
 
     if args.json:
         print(format_json(data))
+    elif args.no_browser:
+        print(format_report(data))
     else:
         print(format_report(data))
+        from .dashboard import start_dashboard
+        start_dashboard(data)
 
 
 if __name__ == "__main__":

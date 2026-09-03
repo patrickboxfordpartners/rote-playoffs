@@ -193,6 +193,7 @@ python3 -m pytest tests/ -v
 ## Project Structure
 
 ```
+mcp_server.py                   # MCP server (stdin/stdout JSON-RPC)
 score.py                        # AI visibility audit (standalone)
 aeo_writer/                     # Content citability engine
   detector.py                   # 5-signal heuristic detection
@@ -215,6 +216,47 @@ aeo_pipeline/                   # Unified pipeline
     schema.py                   # Typed message schemas
 tests/                          # Test suite
 ```
+
+## MCP Server
+
+The toolkit includes a Model Context Protocol server so AI assistants can run AEO audits directly. Zero external dependencies — pure Python stdlib.
+
+**Tools exposed:**
+
+| Tool | What it does | Required input |
+|------|-------------|----------------|
+| `audit_url` | AI visibility audit (0-100 score, 4 dimensions, fix recommendations) | `url` |
+| `analyze_content` | Content citability analysis (5-signal heuristic engine) | `text` or `url` |
+| `full_pipeline` | Combined audit: visibility + content quality + agent readiness | `url` |
+
+**Setup** — add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "aeo-toolkit": {
+      "command": "python3",
+      "args": ["/path/to/rote-playoffs/mcp_server.py"]
+    }
+  }
+}
+```
+
+Or for Claude Code (`.claude.json`):
+
+```json
+{
+  "mcpServers": {
+    "aeo-toolkit": {
+      "command": "python3",
+      "args": ["/path/to/rote-playoffs/mcp_server.py"],
+      "type": "stdio"
+    }
+  }
+}
+```
+
+Then ask Claude to "audit example.com for AI visibility" and it will use the tools directly.
 
 ## Rote Plays
 

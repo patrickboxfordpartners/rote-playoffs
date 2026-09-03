@@ -142,7 +142,7 @@ python3 -m aeo_writer write \
 
 ```bash
 # Clone
-git clone https://github.com/patrickmitchell/rote-playoffs.git
+git clone https://github.com/patrickboxfordpartners/rote-playoffs.git
 cd rote-playoffs
 
 # Run the full pipeline on any URL (Python 3.10+, no pip install needed)

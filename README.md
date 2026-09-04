@@ -260,13 +260,14 @@ Then ask Claude to "audit example.com for AI visibility" and it will use the too
 
 ## Rote Plays
 
-All three tools are packaged as [Rote](https://rote.dev) plays for the hackathon registry:
+All tools are packaged as [Rote](https://rote.dev) plays for the hackathon registry:
 
 | Play | Parameters | API Keys |
 |------|-----------|----------|
 | `aeo-pipeline` | `url` (required) | None for standard; optional keys for `--agents` mode |
 | `ai-visibility-audit` | `url` (required) | None |
 | `aeo-writer` | `command`, `input` (required); `target_url`, `keywords` (optional) | None for detect; `ANTHROPIC_API_KEY` for write |
+| `aeo-mcp-setup` | None | None |
 
 ## Links
 
@@ -275,6 +276,7 @@ All three tools are packaged as [Rote](https://rote.dev) plays for the hackathon
 - [AEO Pipeline Play](https://play.modiqo.ai/patrickmitchell/aeo-pipeline@2.0.3) — Full AI readiness scan via Rote
 - [AI Visibility Audit Play](https://play.modiqo.ai/patrickmitchell/ai-visibility-audit@1.1.1) — Technical visibility score via Rote
 - [AEO Writer Play](https://play.modiqo.ai/patrickmitchell/aeo-writer@1.0.1) — Content citability audit via Rote
+- [AEO MCP Setup Play](https://play.modiqo.ai/patrickmitchell/aeo-mcp-setup@1.0.0) — Install MCP server for Claude Desktop/Code
 
 ---
 

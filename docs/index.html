@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AEO Toolkit — Make Your Content Visible to AI | Boxford Partners</title>
-  <meta name="description" content="Free, open-source tools that audit and improve how AI assistants see your website. Get an AI Readiness Score, content quality analysis, and agent readiness check in one command.">
+  <meta name="description" content="Free, open-source tools that audit and improve how AI assistants see your website. One URL in, complete AI Readiness Score out.">
   <meta property="og:title" content="AEO Toolkit — Make Your Content Visible to AI">
   <meta property="og:description" content="Free, open-source tools that audit and improve how AI assistants see your website. One URL in, complete diagnosis out.">
   <meta property="og:type" content="website">
@@ -20,25 +20,33 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "AEO Toolkit",
-    "applicationCategory": "DeveloperApplication",
-    "operatingSystem": "Cross-platform",
-    "description": "Three open-source tools that audit and improve how AI assistants see your website. Technical visibility scoring, content quality analysis, and agent readiness checks.",
-    "url": "https://patrickboxfordpartners.github.io/rote-playoffs/",
-    "author": {
-      "@type": "Organization",
-      "name": "Boxford Partners",
-      "url": "https://www.boxfordpartners.com",
-      "sameAs": [
-        "https://github.com/patrickboxfordpartners"
-      ]
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    }
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.boxfordpartners.com/#organization",
+        "name": "Boxford Partners",
+        "url": "https://www.boxfordpartners.com",
+        "description": "AI operations consultancy for service and B2B businesses.",
+        "sameAs": [
+          "https://github.com/patrickboxfordpartners",
+          "https://www.linkedin.com/company/boxfordpartners"
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "AEO Toolkit",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Cross-platform",
+        "description": "Three open-source tools that audit and improve how AI assistants see your website. Technical visibility scoring, content quality analysis, and agent readiness checks.",
+        "url": "https://patrickboxfordpartners.github.io/rote-playoffs/",
+        "author": { "@id": "https://www.boxfordpartners.com/#organization" },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        }
+      }
+    ]
   }
   </script>
 

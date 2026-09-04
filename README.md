@@ -272,7 +272,9 @@ All three tools are packaged as [Rote](https://rote.dev) plays for the hackathon
 
 - [AEO Toolkit Landing Page](https://patrickboxfordpartners.github.io/rote-playoffs/) — Interactive guide with FAQ
 - [Boxford Partners AEO Tools](https://www.boxfordpartners.com/tools/aeo) — Learn more about AEO and how we use it
-- [Rote Play Registry](https://play.modiqo.ai/patrickmitchell/aeo-pipeline@2.0.0) — Run directly via Rote
+- [AEO Pipeline Play](https://play.modiqo.ai/patrickmitchell/aeo-pipeline@2.0.1) — Full AI readiness scan via Rote
+- [AI Visibility Audit Play](https://play.modiqo.ai/patrickmitchell/ai-visibility-audit@1.1.1) — Technical visibility score via Rote
+- [AEO Writer Play](https://play.modiqo.ai/patrickmitchell/aeo-writer@1.0.1) — Content citability audit via Rote
 
 ---
 

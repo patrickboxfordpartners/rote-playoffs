@@ -1,0 +1,35 @@
+# AEO Toolkit
+
+> Free, open-source tools that audit and improve how AI assistants see your website. One URL in, complete AI Readiness Score out.
+
+Built by Boxford Partners (https://www.boxfordpartners.com), an AI operations consultancy for service and B2B businesses.
+
+## What This Is
+
+Three Python tools (zero external dependencies for core audit) that measure and improve AI visibility:
+
+- **AEO Pipeline** — Full AI readiness scan. Returns a 0-100 combined score across technical visibility, content quality, and agent readiness. Opens an interactive dashboard.
+- **AI Visibility Audit** — Technical scoring across four dimensions: AI crawler access (25pts), structured data (30pts), content citability (25pts), entity/authority (20pts). Includes copy-paste fix recommendations.
+- **Content Quality Engine** — Analyzes text against five citability signals: burstiness, vocabulary, hedging, monotony, specificity. Works on files or URLs.
+
+## Quick Start
+
+```
+git clone https://github.com/patrickboxfordpartners/rote-playoffs.git
+cd rote-playoffs
+python3 -m aeo_pipeline yoursite.com
+```
+
+## Links
+
+- Source: https://github.com/patrickboxfordpartners/rote-playoffs
+- Landing page: https://patrickboxfordpartners.github.io/rote-playoffs/
+- Boxford Partners AEO: https://www.boxfordpartners.com/tools/aeo
+
+## MCP Server
+
+The toolkit includes an MCP server for Claude Desktop and Claude Code integration. Three tools: audit_url, analyze_content, full_pipeline.
+
+## License
+
+MIT License. Copyright 2026 Patrick Mitchell / Boxford Partners LLC.

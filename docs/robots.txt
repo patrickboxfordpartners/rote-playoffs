@@ -13,4 +13,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://patrickboxfordpartners.github.io/rote-playoffs/sitemap.xml
+Sitemap: https://aeo.boxfordpartners.com/sitemap.xml

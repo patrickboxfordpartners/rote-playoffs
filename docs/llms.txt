@@ -23,7 +23,7 @@ python3 -m aeo_pipeline yoursite.com
 ## Links
 
 - Source: https://github.com/patrickboxfordpartners/rote-playoffs
-- Landing page: https://patrickboxfordpartners.github.io/rote-playoffs/
+- Landing page: https://aeo.boxfordpartners.com/
 - Boxford Partners AEO: https://www.boxfordpartners.com/tools/aeo
 
 ## MCP Server

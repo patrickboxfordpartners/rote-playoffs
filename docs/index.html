@@ -8,14 +8,14 @@
   <meta property="og:title" content="AEO Toolkit — Make Your Content Visible to AI">
   <meta property="og:description" content="Free, open-source tools that audit and improve how AI assistants see your website. One URL in, complete AI Readiness Score out.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://patrickboxfordpartners.github.io/rote-playoffs/">
+  <meta property="og:url" content="https://aeo.boxfordpartners.com/">
   <meta property="og:image" content="https://www.boxfordpartners.com/og-default.png">
   <meta property="og:site_name" content="Boxford Partners">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="AEO Toolkit — Make Your Content Visible to AI">
   <meta name="twitter:description" content="Free, open-source tools that audit and improve how AI assistants see your website.">
   <meta name="twitter:image" content="https://www.boxfordpartners.com/og-default.png">
-  <link rel="canonical" href="https://patrickboxfordpartners.github.io/rote-playoffs/">
+  <link rel="canonical" href="https://aeo.boxfordpartners.com/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,7 +34,7 @@
         "sameAs": [
           "https://github.com/patrickboxfordpartners",
           "https://www.linkedin.com/company/boxfordpartners",
-          "https://patrickboxfordpartners.github.io/rote-playoffs/"
+          "https://aeo.boxfordpartners.com/"
         ]
       },
       {
@@ -51,7 +51,7 @@
         "applicationCategory": "DeveloperApplication",
         "operatingSystem": "Cross-platform",
         "description": "Three open-source tools that audit and improve how AI assistants see your website. Technical visibility scoring, content quality analysis, and agent readiness checks.",
-        "url": "https://patrickboxfordpartners.github.io/rote-playoffs/",
+        "url": "https://aeo.boxfordpartners.com/",
         "author": { "@id": "https://www.boxfordpartners.com/#person-patrick" },
         "publisher": { "@id": "https://www.boxfordpartners.com/#organization" },
         "offers": {
@@ -79,7 +79,7 @@
             "@type": "ListItem",
             "position": 3,
             "name": "AEO Toolkit",
-            "item": "https://patrickboxfordpartners.github.io/rote-playoffs/"
+            "item": "https://aeo.boxfordpartners.com/"
           }
         ]
       }
@@ -762,14 +762,14 @@
   <section class="practice-section">
     <div class="container" style="max-width:720px;">
       <div class="section-label">AEO in Practice</div>
-      <h2 class="section-title" style="text-align:left;">Wait, why isn't this page on boxfordpartners.com?</h2>
+      <h2 class="section-title" style="text-align:left;">Wait, why is this on a subdomain?</h2>
       <div style="color:var(--muted-foreground); font-size:1.0625rem; line-height:1.75;">
-        <p style="margin-bottom:20px;">I know what you're asking yourself. Why don't you just put this page directly on your boxfordpartners.com website? Well, it's a funny story. And it's actually a live demonstration of what this toolkit measures.</p>
-        <p style="margin-bottom:20px;"><strong style="color:var(--foreground);">We did.</strong> The main AEO Toolkit page lives at <a href="https://www.boxfordpartners.com/tools/aeo">boxfordpartners.com/tools/aeo</a>. This page exists here on GitHub Pages as a companion. And the reason comes down to one of the most important (and least understood) decisions in AEO: <strong style="color:var(--foreground);">subdirectory vs. subdomain.</strong></p>
-        <p style="margin-bottom:20px;">Here's the thing most people don't know: search engines and AI crawlers treat subdomains as separate websites. If we hosted this at <code style="background:var(--background); padding:2px 6px; border-radius:4px; font-size:0.9em;">aeo.boxfordpartners.com</code>, every backlink pointing here would build authority for that subdomain instead of the main domain. All the link equity from this GitHub repo, the README, the hackathon references, the cross-links from other sites — it would all flow into a separate bucket that doesn't help boxfordpartners.com rank for anything.</p>
-        <p style="margin-bottom:20px;">But when the primary page lives at <code style="background:var(--background); padding:2px 6px; border-radius:4px; font-size:0.9em;">boxfordpartners.com/tools/aeo</code> — a subdirectory — every inbound link strengthens the entire domain. The FAQ schema markup on that page, the SoftwareApplication structured data, the backlinks from GitHub — all of it consolidates under one domain authority. The AEO page benefits from the trust the main site has already built, and the main site benefits from the new topical authority the AEO page creates.</p>
-        <p style="margin-bottom:20px;">So why does this page exist at all? <strong style="color:var(--foreground);">Bidirectional link equity.</strong> This GitHub Pages site links to boxfordpartners.com, and boxfordpartners.com links back here. Two different domains referencing each other with relevant, contextual links — that's exactly the kind of signal both search engines and AI crawlers use to determine authority on a topic.</p>
-        <p style="margin-bottom:0;"><strong style="color:var(--foreground);">This is what AEO looks like in practice.</strong> Not tricks. Not gaming. Just understanding how the systems work and structuring your content so the right information reaches the right places. That's what the toolkit measures, and it's what we do for every client at Boxford Partners.</p>
+        <p style="margin-bottom:20px;">Good question. And the answer is a live demonstration of what this toolkit measures and the tradeoffs it forces you to think about.</p>
+        <p style="margin-bottom:20px;"><strong style="color:var(--foreground);">The primary AEO Toolkit page lives at <a href="https://www.boxfordpartners.com/tools/aeo">boxfordpartners.com/tools/aeo</a></strong> — a subdirectory, not a subdomain. That's intentional. Search engines and AI crawlers treat subdomains as separate websites. Every backlink to that subdirectory page strengthens the entire boxfordpartners.com domain. The FAQ schema, the SoftwareApplication structured data, the backlinks from GitHub — all of it consolidates under one domain authority.</p>
+        <p style="margin-bottom:20px;">So why does <code style="background:var(--background); padding:2px 6px; border-radius:4px; font-size:0.9em;">aeo.boxfordpartners.com</code> exist? <strong style="color:var(--foreground);">Because we ate our own dog food.</strong> We ran this toolkit on our own GitHub Pages site and scored 62 out of 100. The audit told us exactly what to fix: add @graph schema, OG tags, breadcrumbs, author markup, structured content. We followed every recommendation and pushed the score to 86.</p>
+        <p style="margin-bottom:20px;">But 14 points were stuck. GitHub Pages project sites serve from a subdirectory path, so robots.txt, llms.txt, and sitemap.xml couldn't be found at the domain root where AI crawlers expect them. Moving to a custom subdomain put those files at the root and unlocked the remaining points. <strong style="color:var(--foreground);">The subdomain tradeoff was worth it</strong> — this page's job is to demonstrate the toolkit's scoring, not to accumulate link equity. The primary authority page at boxfordpartners.com/tools/aeo still handles that.</p>
+        <p style="margin-bottom:20px;">The two pages serve different purposes and link to each other. The subdirectory page builds domain authority. The subdomain page proves the toolkit works with a <a href="before-after.html">real before-and-after case study</a>. That's not a contradiction — it's exactly the kind of structural decision the audit helps you make.</p>
+        <p style="margin-bottom:0;"><strong style="color:var(--foreground);">This is what AEO looks like in practice.</strong> Not tricks. Not one-size-fits-all rules. Understanding the tradeoffs, measuring the results, and making the choice that fits your goal. That's what the toolkit measures, and it's what we do for every client at Boxford Partners.</p>
       </div>
     </div>
   </section>

@@ -1,0 +1,79 @@
+# AEO Toolkit — Complete Reference
+
+> Free, open-source tools that audit and improve how AI assistants see your website. One URL in, complete AI Readiness Score out.
+
+Built by Patrick Mitchell / Boxford Partners (https://www.boxfordpartners.com), an AI operations consultancy for service and B2B businesses.
+
+## Tools
+
+### AEO Pipeline
+Full AI readiness scan. Enter a URL and get an interactive dashboard with scores across three dimensions: technical visibility, content quality, and agent readiness. Returns a 0-100 combined AI Readiness Score with plain-language explanations and a prioritized action plan.
+
+Usage:
+```
+git clone https://github.com/patrickboxfordpartners/rote-playoffs.git
+cd rote-playoffs
+python3 -m aeo_pipeline yoursite.com
+```
+
+No API keys required for core functionality. Optional multi-agent mode with Firecrawl, OpenAI, or Anthropic keys for LLM-generated insights.
+
+### AI Visibility Audit
+Technical scoring across four dimensions:
+- AI Crawler Access (25 points): robots.txt, llms.txt, sitemap.xml, bot-specific policies
+- Structured Data (30 points): JSON-LD, @graph, schema types, Open Graph, Twitter Cards
+- Content Citability (25 points): heading hierarchy, word count, Q&A patterns, lists, tables
+- Entity & Authority (20 points): author schema, social links, brand consistency, contact/about pages
+
+Returns a 0-100 score with copy-paste fix recommendations sorted by impact.
+
+Usage:
+```
+python3 score.py yoursite.com
+```
+
+### Content Quality Engine (AEO Writer)
+Analyzes text against five citability signals that determine whether AI assistants will cite your content:
+1. Burstiness — sentence length variation (real writers mix short and long)
+2. Vocabulary — checks for overused filler words that signal templated content
+3. Hedging — detects weak qualifiers (AI prefers definitive statements)
+4. Monotony — measures repetitive paragraph structure
+5. Specificity — looks for concrete details like numbers, names, and data points
+
+Works on files or URLs. Returns a 0-100 citability score with per-signal breakdown and specific improvement suggestions.
+
+Usage:
+```
+python3 -m aeo_writer detect path/to/article.md
+```
+
+### MCP Server
+Model Context Protocol server for Claude Desktop and Claude Code integration. Three tools:
+- audit_url: AI visibility score (0-100) for any URL
+- analyze_content: Content citability analysis (5 signals)
+- full_pipeline: Complete AI readiness assessment
+
+Install via Rote Play:
+```
+rote play run aeo-mcp-setup
+```
+
+## Rote Plays (Hackathon Registry)
+Available on the Rote registry at play.modiqo.ai:
+- patrickmitchell/aeo-pipeline — Full AI readiness scan with dashboard
+- patrickmitchell/ai-visibility-audit — Technical visibility scoring
+- patrickmitchell/aeo-writer — Content citability analysis
+- patrickmitchell/aeo-mcp-setup — One-command MCP server installation
+
+## Links
+- Source: https://github.com/patrickboxfordpartners/rote-playoffs
+- Landing page: https://aeo.boxfordpartners.com/
+- Before/After case study: https://aeo.boxfordpartners.com/before-after.html
+- Boxford Partners AEO: https://www.boxfordpartners.com/tools/aeo
+- Boxford Partners: https://www.boxfordpartners.com
+
+## Technical Details
+- Language: Python 3.10+
+- Dependencies: None for core audit (stdlib only). Optional: firecrawl-py, openai, anthropic
+- License: MIT
+- Author: Patrick Mitchell / Boxford Partners LLC

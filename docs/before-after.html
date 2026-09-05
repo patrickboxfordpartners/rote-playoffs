@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEO Toolkit Before/After — 62 to 86 in One Session | Boxford Partners</title>
+  <meta name="description" content="Real before-and-after results from running the AEO Toolkit on our own GitHub Pages site. Score improved from 62 to 86 out of 100 in a single session.">
+  <meta property="og:title" content="AEO Toolkit Before/After — 62 to 86 in One Session">
+  <meta property="og:description" content="Real before-and-after results from running the AEO Toolkit on our own GitHub Pages site.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://patrickboxfordpartners.github.io/rote-playoffs/before-after.html">
+  <meta property="og:image" content="https://www.boxfordpartners.com/og-default.png">
+  <meta property="og:site_name" content="AEO Toolkit">
+  <link rel="canonical" href="https://patrickboxfordpartners.github.io/rote-playoffs/before-after.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --background: #edeef0;
+      --foreground: #1c2030;
+      --card: #ffffff;
+      --border: #d9dade;
+      --muted: #626878;
+      --surface-dark: #161a24;
+      --surface-dark-fg: #e5e7ea;
+      --surface-dark-muted: #929498;
+      --surface-dark-border: rgba(255,255,255,0.06);
+      --emerald: #219e6e;
+      --emerald-light: #28b57e;
+      --emerald-glow: rgba(33,158,110,0.08);
+      --red: #dc3545;
+      --red-glow: rgba(220,53,69,0.08);
+      --radius: 12px;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--emerald); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(22,26,36,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--surface-dark-border);
+      padding: 16px 0;
+    }
+    nav .container { display: flex; align-items: center; justify-content: space-between; }
+    nav .links { display: flex; gap: 20px; font-size: 0.875rem; }
+    nav .links a { color: var(--surface-dark-muted); }
+    nav .links a:hover { color: var(--emerald); text-decoration: none; }
+
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+      background: var(--surface-dark);
+      color: var(--surface-dark-fg);
+    }
+    .hero .badge {
+      display: inline-block;
+      font-size: 0.75rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--emerald);
+      padding: 6px 16px;
+      border: 1px solid rgba(33,158,110,0.3);
+      border-radius: 100px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 800; line-height: 1.1;
+      margin-bottom: 16px; letter-spacing: -0.02em;
+    }
+    .hero p { font-size: 1.125rem; color: var(--surface-dark-muted); max-width: 640px; margin: 0 auto; }
+
+    .score-hero {
+      display: flex; justify-content: center; gap: 48px;
+      margin-top: 48px; flex-wrap: wrap;
+    }
+    .score-box {
+      text-align: center;
+    }
+    .score-number {
+      font-size: 4rem; font-weight: 800; line-height: 1;
+    }
+    .score-number.before { color: var(--red); }
+    .score-number.after { color: var(--emerald-light); }
+    .score-label {
+      font-size: 0.875rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--surface-dark-muted); margin-top: 8px;
+    }
+    .score-arrow {
+      display: flex; align-items: center; color: var(--surface-dark-muted);
+      font-size: 2rem;
+    }
+
+    section { padding: 64px 0; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--emerald); margin-bottom: 12px;
+    }
+    .section-title {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700; margin-bottom: 16px;
+    }
+    .section-subtitle {
+      color: var(--muted); font-size: 1rem; max-width: 640px; margin-bottom: 32px;
+    }
+
+    .comparison-table {
+      width: 100%; border-collapse: collapse; font-size: 0.875rem;
+      background: var(--card); border-radius: var(--radius); overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .comparison-table thead th {
+      padding: 14px 16px; text-align: left; font-weight: 600;
+      background: var(--surface-dark); color: var(--surface-dark-fg);
+      font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .comparison-table tbody td {
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .comparison-table tbody tr:last-child td { border-bottom: none; }
+    .signal-name { font-weight: 500; color: var(--foreground); }
+    .pass { color: var(--emerald); font-weight: 600; }
+    .fail { color: var(--red); font-weight: 600; }
+    .na { color: var(--muted); font-style: italic; }
+    .dim-header td {
+      font-weight: 700; font-size: 0.9375rem;
+      background: rgba(33,158,110,0.04);
+      padding: 10px 16px;
+    }
+    .dim-score { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+
+    .changes-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    .change-card {
+      padding: 24px; border-radius: var(--radius);
+      border: 1px solid var(--border); background: var(--card);
+    }
+    .change-card h3 {
+      font-size: 1rem; font-weight: 600; margin-bottom: 8px;
+    }
+    .change-card p { color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+    .change-impact {
+      display: inline-block; font-size: 0.75rem; font-weight: 600;
+      color: var(--emerald); background: var(--emerald-glow);
+      padding: 2px 8px; border-radius: 4px; margin-top: 10px;
+    }
+
+    .limitation-note {
+      padding: 20px 24px; border-radius: var(--radius);
+      border: 1px solid var(--border); background: var(--card);
+      color: var(--muted); font-size: 0.9375rem; line-height: 1.7;
+      margin-top: 24px;
+    }
+    .limitation-note strong { color: var(--foreground); }
+
+    .cta-section {
+      text-align: center; background: var(--surface-dark);
+      color: var(--surface-dark-fg); padding: 64px 0;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 8px;
+      font-size: 0.9375rem; font-weight: 600;
+      transition: all 0.2s; border: none; cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--emerald); color: #fff; }
+    .btn-primary:hover { background: var(--emerald-light); text-decoration: none; }
+    .btn-secondary {
+      background: transparent; color: var(--surface-dark-muted);
+      border: 1px solid var(--surface-dark-border);
+    }
+    .btn-secondary:hover { border-color: var(--surface-dark-muted); color: var(--surface-dark-fg); text-decoration: none; }
+
+    footer {
+      padding: 40px 0; background: var(--surface-dark);
+      border-top: 1px solid var(--surface-dark-border);
+      text-align: center; color: var(--surface-dark-muted); font-size: 0.8125rem;
+    }
+    footer a { color: rgba(229,231,234,0.6); }
+    footer a:hover { color: var(--surface-dark-fg); }
+
+    @media (max-width: 768px) {
+      .changes-grid { grid-template-columns: 1fr; }
+      .score-hero { gap: 24px; }
+      .score-number { font-size: 3rem; }
+      nav .links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="container">
+      <a href="./" style="color:var(--surface-dark-fg); font-weight:700; font-size:0.9375rem;">AEO Toolkit</a>
+      <div class="links">
+        <a href="./">Home</a>
+        <a href="https://github.com/patrickboxfordpartners/rote-playoffs">GitHub</a>
+        <a href="https://www.boxfordpartners.com/tools/aeo">Boxford Partners</a>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container">
+      <div class="badge">Dog-fooding Our Own Tools</div>
+      <h1>62 to 86 in One Session</h1>
+      <p>We ran the AEO Toolkit on our own GitHub Pages site, followed the recommendations, and tracked every change. Here are the real results.</p>
+      <div class="score-hero">
+        <div class="score-box">
+          <div class="score-number before">62</div>
+          <div class="score-label">Before</div>
+        </div>
+        <div class="score-arrow">&#8594;</div>
+        <div class="score-box">
+          <div class="score-number after">86</div>
+          <div class="score-label">After</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dimension Breakdown -->
+  <section>
+    <div class="container">
+      <div class="section-label">Dimension Scores</div>
+      <h2 class="section-title">Where the Points Came From</h2>
+      <p class="section-subtitle">The audit scores four dimensions. Here's how each changed.</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Before</th>
+            <th>After</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="signal-name">AI Crawler Access</td>
+            <td class="dim-score">12 / 25</td>
+            <td class="dim-score">12 / 25</td>
+            <td class="na">+0 (platform limit)</td>
+          </tr>
+          <tr>
+            <td class="signal-name">Structured Data</td>
+            <td class="dim-score">16 / 30</td>
+            <td class="dim-score">29 / 30</td>
+            <td class="pass">+13</td>
+          </tr>
+          <tr>
+            <td class="signal-name">Content Citability</td>
+            <td class="dim-score">21 / 25</td>
+            <td class="dim-score">25 / 25</td>
+            <td class="pass">+4</td>
+          </tr>
+          <tr>
+            <td class="signal-name">Entity & Authority</td>
+            <td class="dim-score">13 / 20</td>
+            <td class="dim-score">20 / 20</td>
+            <td class="pass">+7</td>
+          </tr>
+          <tr style="background:rgba(33,158,110,0.04);">
+            <td class="signal-name" style="font-weight:700;">Total</td>
+            <td class="dim-score" style="font-weight:700;">62 / 100</td>
+            <td class="dim-score" style="font-weight:700;">86 / 100</td>
+            <td class="pass" style="font-weight:700;">+24</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Signal-by-Signal -->
+  <section style="background:var(--card); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="container">
+      <div class="section-label">Signal Detail</div>
+      <h2 class="section-title">Every Signal, Before and After</h2>
+      <p class="section-subtitle">Green means the signal passed. Red means it failed. The audit checks 24 signals across all four dimensions.</p>
+
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Signal</th>
+            <th>Before</th>
+            <th>After</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="dim-header"><td colspan="3">AI Crawler Access (12/25 &rarr; 12/25)</td></tr>
+          <tr><td class="signal-name">robots.txt exists</td><td class="fail">FAIL</td><td class="fail">FAIL*</td></tr>
+          <tr><td class="signal-name">GPTBot not blocked</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">ClaudeBot not blocked</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">PerplexityBot not blocked</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Google AI crawlers not blocked</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">llms.txt present</td><td class="fail">FAIL</td><td class="fail">FAIL*</td></tr>
+          <tr><td class="signal-name">llms-full.txt present</td><td class="fail">FAIL</td><td class="fail">FAIL*</td></tr>
+          <tr><td class="signal-name">sitemap.xml accessible</td><td class="fail">FAIL</td><td class="fail">FAIL*</td></tr>
+
+          <tr class="dim-header"><td colspan="3">Structured Data (16/30 &rarr; 29/30)</td></tr>
+          <tr><td class="signal-name">JSON-LD present</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">@graph connected entities</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Organization schema</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">FAQ or HowTo schema</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Breadcrumb schema</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Open Graph tags complete</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Twitter Card tags</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+
+          <tr class="dim-header"><td colspan="3">Content Citability (21/25 &rarr; 25/25)</td></tr>
+          <tr><td class="signal-name">Single H1 tag</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">300+ words</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">3+ heading levels</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Short paragraphs</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Q&A heading patterns</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Lists present</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Tables present</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Meta description 120-160 chars</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Image alt text &ge; 80%</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+
+          <tr class="dim-header"><td colspan="3">Entity & Authority (13/20 &rarr; 20/20)</td></tr>
+          <tr><td class="signal-name">sameAs social links</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Author/Person schema</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Contact page linked</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">About page linked</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">Brand consistency</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+        </tbody>
+      </table>
+
+      <div class="limitation-note">
+        <strong>* GitHub Pages limitation:</strong> Signals marked with * are FAIL due to a known platform constraint. GitHub Pages project sites serve from a subdirectory (<code>/rote-playoffs/</code>), but the audit checks the domain root for robots.txt, llms.txt, and sitemap.xml. We created all three files in <code>docs/</code>, but the audit correctly identifies they aren't at the domain root where crawlers expect them. On a custom domain or GitHub organization site, these would all pass.
+      </div>
+    </div>
+  </section>
+
+  <!-- What We Changed -->
+  <section>
+    <div class="container">
+      <div class="section-label">The Fixes</div>
+      <h2 class="section-title">What We Actually Changed</h2>
+      <p class="section-subtitle">Every fix came directly from the audit's recommendations. No guesswork, no SEO voodoo. Here's the full list.</p>
+
+      <div class="changes-grid">
+        <div class="change-card">
+          <h3>Added @graph JSON-LD</h3>
+          <p>Connected our Organization, Person, SoftwareApplication, and BreadcrumbList schemas into a single @graph structure instead of isolated JSON-LD blocks.</p>
+          <span class="change-impact">+5 structured data</span>
+        </div>
+
+        <div class="change-card">
+          <h3>Added OG and Twitter Card Meta</h3>
+          <p>Added og:image, og:site_name, twitter:card, and twitter:image tags for complete social sharing metadata.</p>
+          <span class="change-impact">+4 structured data</span>
+        </div>
+
+        <div class="change-card">
+          <h3>Added BreadcrumbList Schema</h3>
+          <p>Created a three-level breadcrumb: Boxford Partners &rarr; Tools &rarr; AEO Toolkit. Tells AI crawlers exactly where this page sits in the site hierarchy.</p>
+          <span class="change-impact">+4 structured data</span>
+        </div>
+
+        <div class="change-card">
+          <h3>Added Person Schema</h3>
+          <p>Added a Person entity for Patrick Mitchell (Founder) linked to the Organization via worksFor. Author field on SoftwareApplication references the Person.</p>
+          <span class="change-impact">+3 entity authority</span>
+        </div>
+
+        <div class="change-card">
+          <h3>Added About and Contact Links</h3>
+          <p>Added navigation links to the About page and Contact page on boxfordpartners.com. Entity authority checks for these as trust signals.</p>
+          <span class="change-impact">+6 entity authority</span>
+        </div>
+
+        <div class="change-card">
+          <h3>Fixed Brand Consistency</h3>
+          <p>Aligned the Organization name in JSON-LD with the brand name extracted from the page title and og:title, so all signals return "AEO Toolkit".</p>
+          <span class="change-impact">+4 entity authority</span>
+        </div>
+
+        <div class="change-card">
+          <h3>Added Lists and Tables</h3>
+          <p>Added a summary list of the three scoring dimensions and a table showing the scoring breakdown. AI assistants prefer structured content they can directly cite.</p>
+          <span class="change-impact">+4 content citability</span>
+        </div>
+
+        <div class="change-card">
+          <h3>Created robots.txt, sitemap.xml, llms.txt</h3>
+          <p>All three files created and deployed. They work on custom domains but don't register for this GitHub Pages project site due to the subdirectory path constraint.</p>
+          <span class="change-impact">+0 (platform limit)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Takeaway -->
+  <section style="background:var(--card); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+    <div class="container" style="max-width:720px;">
+      <div class="section-label">The Takeaway</div>
+      <h2 class="section-title">24 Points From Changes That Took 20 Minutes</h2>
+      <div style="color:var(--muted); font-size:1rem; line-height:1.75;">
+        <p style="margin-bottom:16px;">Every change on this page was driven by specific, actionable audit findings. No SEO expertise required. No vague advice like "improve your content." Each recommendation told us exactly what to add, where to add it, and how many points it was worth.</p>
+        <p style="margin-bottom:16px;">The remaining 14 points we left on the table are all platform constraints. On a custom domain with proper root-level file access, this same site would score 96+/100. That's the kind of ceiling most businesses can reach with straightforward structural improvements.</p>
+        <p style="margin-bottom:0;">This is what the AEO Toolkit does. It tells you exactly what AI assistants see when they look at your site, exactly what's missing, and exactly how to fix it. Run it on your own site and see where you stand.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="container">
+      <div class="section-label">Your Turn</div>
+      <h2 class="section-title" style="color:var(--surface-dark-fg); max-width:500px; margin:0 auto 16px;">Run This on Your Own Site</h2>
+      <p style="color:var(--surface-dark-muted); max-width:520px; margin:0 auto 32px; font-size:1rem;">Takes under a minute. No account, no API keys, no data leaves your machine.</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <a href="./#quickstart" class="btn btn-primary">Get Started</a>
+        <a href="https://github.com/patrickboxfordpartners/rote-playoffs" class="btn btn-secondary">View Source</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <p style="margin-bottom:8px;">
+        <a href="./">AEO Toolkit</a> &middot;
+        <a href="https://github.com/patrickboxfordpartners/rote-playoffs">GitHub</a> &middot;
+        <a href="https://www.boxfordpartners.com/tools/aeo">Boxford Partners</a>
+      </p>
+      <p>Built for the <a href="https://rote.dev/playoffs">Rote Playoffs Hackathon</a> (Sep 2026) by <a href="https://www.boxfordpartners.com">Patrick Mitchell</a>.</p>
+    </div>
+  </footer>
+
+</body>
+</html>

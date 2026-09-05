@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AEO Toolkit Before/After — 62 to 96 in One Session | Boxford Partners</title>
-  <meta name="description" content="Real before-and-after results from running the AEO Toolkit on our own site. Score improved from 62 to 96 out of 100 in a single session.">
-  <meta property="og:title" content="AEO Toolkit Before/After — 62 to 96 in One Session">
+  <title>AEO Toolkit Before/After — 62 to 99 in One Session | Boxford Partners</title>
+  <meta name="description" content="Real before-and-after results from running the AEO Toolkit on our own site. Score improved from 62 to 99 out of 100 in a single session.">
+  <meta property="og:title" content="AEO Toolkit Before/After — 62 to 99 in One Session">
   <meta property="og:description" content="Real before-and-after results from running the AEO Toolkit on our own site.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://aeo.boxfordpartners.com/before-after.html">
@@ -217,7 +217,7 @@
   <section class="hero">
     <div class="container">
       <div class="badge">Dog-fooding Our Own Tools</div>
-      <h1>62 to 86 in One Session</h1>
+      <h1>62 to 99 in One Session</h1>
       <p>We ran the AEO Toolkit on our own GitHub Pages site, followed the recommendations, and tracked every change. Here are the real results.</p>
       <div class="score-hero">
         <div class="score-box">
@@ -226,7 +226,7 @@
         </div>
         <div class="score-arrow">&#8594;</div>
         <div class="score-box">
-          <div class="score-number after">86</div>
+          <div class="score-number after">99</div>
           <div class="score-label">After</div>
         </div>
       </div>
@@ -253,8 +253,8 @@
           <tr>
             <td class="signal-name">AI Crawler Access</td>
             <td class="dim-score">12 / 25</td>
-            <td class="dim-score">12 / 25</td>
-            <td class="na">+0 (platform limit)</td>
+            <td class="dim-score">25 / 25</td>
+            <td class="pass">+13</td>
           </tr>
           <tr>
             <td class="signal-name">Structured Data</td>
@@ -277,8 +277,8 @@
           <tr style="background:rgba(33,158,110,0.04);">
             <td class="signal-name" style="font-weight:700;">Total</td>
             <td class="dim-score" style="font-weight:700;">62 / 100</td>
-            <td class="dim-score" style="font-weight:700;">86 / 100</td>
-            <td class="pass" style="font-weight:700;">+24</td>
+            <td class="dim-score" style="font-weight:700;">99 / 100</td>
+            <td class="pass" style="font-weight:700;">+37</td>
           </tr>
         </tbody>
       </table>
@@ -301,15 +301,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="dim-header"><td colspan="3">AI Crawler Access (12/25 &rarr; 12/25)</td></tr>
-          <tr><td class="signal-name">robots.txt exists</td><td class="fail">FAIL</td><td class="fail">FAIL*</td></tr>
+          <tr class="dim-header"><td colspan="3">AI Crawler Access (12/25 &rarr; 25/25)</td></tr>
+          <tr><td class="signal-name">robots.txt exists</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
           <tr><td class="signal-name">GPTBot not blocked</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
           <tr><td class="signal-name">ClaudeBot not blocked</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
           <tr><td class="signal-name">PerplexityBot not blocked</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
           <tr><td class="signal-name">Google AI crawlers not blocked</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
-          <tr><td class="signal-name">llms.txt present</td><td class="fail">FAIL</td><td class="fail">FAIL*</td></tr>
-          <tr><td class="signal-name">llms-full.txt present</td><td class="fail">FAIL</td><td class="fail">FAIL*</td></tr>
-          <tr><td class="signal-name">sitemap.xml accessible</td><td class="fail">FAIL</td><td class="fail">FAIL*</td></tr>
+          <tr><td class="signal-name">llms.txt present</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">llms-full.txt present</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
+          <tr><td class="signal-name">sitemap.xml accessible</td><td class="fail">FAIL</td><td class="pass">PASS</td></tr>
 
           <tr class="dim-header"><td colspan="3">Structured Data (16/30 &rarr; 29/30)</td></tr>
           <tr><td class="signal-name">JSON-LD present</td><td class="pass">PASS</td><td class="pass">PASS</td></tr>
@@ -341,7 +341,7 @@
       </table>
 
       <div class="limitation-note">
-        <strong>* GitHub Pages limitation:</strong> Signals marked with * are FAIL due to a known platform constraint. GitHub Pages project sites serve from a subdirectory (<code>/rote-playoffs/</code>), but the audit checks the domain root for robots.txt, llms.txt, and sitemap.xml. We created all three files in <code>docs/</code>, but the audit correctly identifies they aren't at the domain root where crawlers expect them. On a custom domain or GitHub organization site, these would all pass.
+        <strong>Why the last point?</strong> The single missing point is in Structured Data &mdash; one optional schema enrichment the audit recommends. Every actionable signal now passes. The original GitHub Pages subdirectory limitation (robots.txt, llms.txt, sitemap.xml unreachable at the domain root) was resolved by moving to a custom domain.
       </div>
     </div>
   </section>
@@ -398,8 +398,14 @@
 
         <div class="change-card">
           <h3>Created robots.txt, sitemap.xml, llms.txt</h3>
-          <p>All three files created and deployed. They work on custom domains but don't register for this GitHub Pages project site due to the subdirectory path constraint.</p>
-          <span class="change-impact">+0 (platform limit)</span>
+          <p>Created robots.txt with AI bot policies, sitemap.xml, llms.txt, and a full llms-full.txt reference document in .well-known/. Added .nojekyll to ensure GitHub Pages serves dotfiles.</p>
+          <span class="change-impact">+9 crawler access</span>
+        </div>
+
+        <div class="change-card">
+          <h3>Moved to Custom Domain</h3>
+          <p>Migrated from <code>patrickboxfordpartners.github.io/rote-playoffs/</code> to <code>aeo.boxfordpartners.com</code>. This resolved the subdirectory path limitation that prevented crawlers from finding root-level files like robots.txt and sitemap.xml.</p>
+          <span class="change-impact">+4 crawler access</span>
         </div>
       </div>
     </div>
@@ -409,10 +415,10 @@
   <section style="background:var(--card); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
     <div class="container" style="max-width:720px;">
       <div class="section-label">The Takeaway</div>
-      <h2 class="section-title">24 Points From Changes That Took 20 Minutes</h2>
+      <h2 class="section-title">37 Points From One Session of Changes</h2>
       <div style="color:var(--muted); font-size:1rem; line-height:1.75;">
         <p style="margin-bottom:16px;">Every change on this page was driven by specific, actionable audit findings. No SEO expertise required. No vague advice like "improve your content." Each recommendation told us exactly what to add, where to add it, and how many points it was worth.</p>
-        <p style="margin-bottom:16px;">The remaining 14 points we left on the table are all platform constraints. On a custom domain with proper root-level file access, this same site would score 96+/100. That's the kind of ceiling most businesses can reach with straightforward structural improvements.</p>
+        <p style="margin-bottom:16px;">We initially hit a ceiling at 86/100 because GitHub Pages project sites serve from a subdirectory &mdash; crawlers couldn't find robots.txt and sitemap.xml at the domain root. Moving to a custom domain (<code>aeo.boxfordpartners.com</code>) resolved that constraint and unlocked the remaining 13 points in AI Crawler Access, bringing us to 99/100.</p>
         <p style="margin-bottom:0;">This is what the AEO Toolkit does. It tells you exactly what AI assistants see when they look at your site, exactly what's missing, and exactly how to fix it. Run it on your own site and see where you stand.</p>
       </div>
     </div>

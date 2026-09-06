@@ -1,0 +1,4 @@
+{
+  "name": "AEO Toolkit",
+  "install": "python3 -m pip install --user --upgrade pip pytest firecrawl-py tavily-python anthropic"
+}

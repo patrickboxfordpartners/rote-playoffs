@@ -1,5 +1,8 @@
 import subprocess
 import sys
+from pathlib import Path
+
+REPO_ROOT = str(Path(__file__).resolve().parent.parent)
 
 
 class TestCLIIntegration:
@@ -7,7 +10,7 @@ class TestCLIIntegration:
         result = subprocess.run(
             [sys.executable, "score.py"],
             capture_output=True, text=True,
-            cwd="/Users/patrickmitchell/rote-playoffs"
+            cwd=REPO_ROOT
         )
         assert result.returncode == 1
         assert "Usage:" in result.stderr
@@ -16,7 +19,7 @@ class TestCLIIntegration:
         result = subprocess.run(
             [sys.executable, "score.py", "not-a-url"],
             capture_output=True, text=True,
-            cwd="/Users/patrickmitchell/rote-playoffs"
+            cwd=REPO_ROOT
         )
         assert result.returncode == 1
 
@@ -25,7 +28,7 @@ class TestCLIIntegration:
             [sys.executable, "score.py", "https://example.com"],
             capture_output=True, text=True,
             timeout=30,
-            cwd="/Users/patrickmitchell/rote-playoffs"
+            cwd=REPO_ROOT
         )
         assert result.returncode == 0
         assert "AI VISIBILITY AUDIT" in result.stdout

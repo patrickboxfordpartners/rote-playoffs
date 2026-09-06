@@ -183,6 +183,11 @@
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* Offset in-page anchor jumps so targets clear the sticky nav on every
+       viewport (the nav is ~57px tall). Without this, anchored section labels
+       land flush with — or hidden behind — the sticky nav on narrow screens. */
+    html { scroll-behavior: smooth; scroll-padding-top: 56px; }
+
     :root {
       --background: #edeef0;
       --foreground: #1c2030;

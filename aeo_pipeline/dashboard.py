@@ -222,6 +222,17 @@ def _build_actions(data):
     return actions[:7]
 
 
+def _script_safe(json_str):
+    """Make a JSON string safe to embed inside an inline <script> tag.
+
+    A literal "</script>" (or "<!--") inside JSON string values — e.g. a
+    JSON-LD code snippet in a recommendation — would otherwise terminate the
+    script element early and break the whole page. Escaping "<" as "\\u003c"
+    keeps the payload valid JSON while preventing premature tag closing.
+    """
+    return json_str.replace("<", "\\u003c")
+
+
 def _fetch_and_annotate(url, annotation_json):
     """Fetch the site HTML and inject annotation overlays.
 
@@ -239,7 +250,7 @@ def _fetch_and_annotate(url, annotation_json):
     base_tag = f'<base href="{base_url}/" target="_blank">'
 
     css = _ANNOTATION_CSS
-    js = _ANNOTATION_JS.replace("__ANNOTATION_DATA__", annotation_json)
+    js = _ANNOTATION_JS.replace("__ANNOTATION_DATA__", _script_safe(annotation_json))
 
     if re.search(r'<head[^>]*>', html, re.IGNORECASE):
         html = re.sub(r'(<head[^>]*>)', r'\1' + base_tag, html, count=1, flags=re.IGNORECASE)
@@ -261,7 +272,7 @@ def start_dashboard(data, open_browser=True):
     report_json = _serialize_data(data)
     annotation_json = _build_annotation_data(data)
 
-    dashboard_html = template.replace("__REPORT_DATA__", report_json)
+    dashboard_html = template.replace("__REPORT_DATA__", _script_safe(report_json))
     site_html = _fetch_and_annotate(data["url"], annotation_json)
 
     class Handler(BaseHTTPRequestHandler):

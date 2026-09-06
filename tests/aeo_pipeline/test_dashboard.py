@@ -2,7 +2,7 @@
 
 import json
 from unittest.mock import MagicMock
-from aeo_pipeline.dashboard import _serialize_data, _build_actions
+from aeo_pipeline.dashboard import _serialize_data, _build_actions, _script_safe
 
 
 def _make_content_result(score=0.3, risk="MODERATE"):
@@ -106,3 +106,17 @@ def test_build_actions_limits_count():
     data = _make_data(recommendations=recs)
     actions = _build_actions(data)
     assert len(actions) <= 7
+
+
+def test_script_safe_escapes_closing_script_tag():
+    # A JSON-LD recommendation snippet contains a literal </script>, which would
+    # otherwise close the dashboard's inline <script> early and break rendering.
+    code = '<script type="application/ld+json">{"@type":"Organization"}</script>'
+    raw = _serialize_data(_make_data(
+        recommendations=[{"title": "Add schema", "points": 5, "why": "AI", "code": code}]
+    ))
+    safe = _script_safe(raw)
+    assert "</script>" not in safe
+    assert "\\u003c/script>" in safe
+    # Still decodes back to the original JSON payload.
+    assert json.loads(safe.replace("\\u003c", "<"))["recommendations"][0]["code"] == code
